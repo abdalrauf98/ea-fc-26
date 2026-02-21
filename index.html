@@ -24,7 +24,7 @@
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0b1120 0, --bg 55%, #000 100%);
+      background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
       color: var(--text-main);
       margin: 0;
       min-height: 100vh;
@@ -462,7 +462,7 @@
         </thead>
         <tbody id="standingsBody"></tbody>
       </table>
-      <div class="small-text">يتم حساب الأرقام من نتائج جدول المباريات بواسطة المنظّم.</div>
+      <div class="small-text">يتم حساب الأرقام من نتائج جدول المباريات بواسطة المنظّم عند الضغط على "تحديث الترتيب" في صفحة الإدارة.</div>
     </div>
 
     <div class="panel">
@@ -481,8 +481,7 @@
             <th>النتيجة</th>
           </tr>
         </thead>
-        <tbody id="viewerMatchesBody">
-        </tbody>
+        <tbody id="viewerMatchesBody"></tbody>
       </table>
       <div class="table-caption">هذه البيانات يتم تعديلها من واجهة الإدارة فقط.</div>
     </div>
@@ -563,9 +562,12 @@
           <span class="panel-title-pill"></span>
           <span>إدارة جدول المباريات</span>
         </div>
-        <span class="panel-subtitle">قم بتوليد الجدول وتعديل النتائج من هنا</span>
+        <span class="panel-subtitle">قم بتوليد الجدول أو إضافة مباريات يدوياً، ثم عدّل النتائج</span>
       </div>
-      <button id="generateSchedule" class="btn-secondary">توليد جدول المباريات حسب نوع البطولة</button>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px;">
+        <button id="generateSchedule" class="btn-secondary">توليد جدول المباريات حسب نوع البطولة</button>
+        <button id="addEmptyMatch" class="btn-secondary">إضافة مباراة فارغة</button>
+      </div>
       <table id="adminMatchesTable">
         <thead>
           <tr>
@@ -576,15 +578,9 @@
           </tr>
         </thead>
         <tbody id="adminMatchesBody">
-          <tr>
-            <td contenteditable="true">-</td>
-            <td contenteditable="true">-</td>
-            <td contenteditable="true">لاعب 1 vs لاعب 2</td>
-            <td contenteditable="true">-</td>
-          </tr>
         </tbody>
       </table>
-      <div class="table-caption">اكتب النتيجة بصيغة 1-3 أو 0-0 ليتم احتسابها في الترتيب.</div>
+      <div class="table-caption">لن يتم مسح الجدول الحالي إلا بعد تأكيدك عند توليد جدول جديد. اكتب النتيجة بصيغة 1-3 أو 0-0.</div>
     </div>
 
     <div class="panel">
@@ -652,8 +648,7 @@
     const adminToggle = $('adminToggle');
     if (isAdmin) {
       modeText.textContent = 'وضع: مدير';
-      adminToggle.textContent = 'تسجيل دخول المدير مفعل';
-      adminToggle.classList.add('btn-secondary');
+      adminToggle.textContent = 'دخول المدير مفعل';
       adminTab.classList.remove('disabled');
     } else {
       modeText.textContent = 'وضع: مشاهد';
@@ -680,23 +675,6 @@
   }
 
   function renderLeagueView() {
-    const body = $('standingsBody');
-    body.innerHTML = '';
-    state.players.forEach(p => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.name}</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-      `;
-      body.appendChild(tr);
-    });
-
     const rulesDisplay = $('rulesDisplay');
     rulesDisplay.innerHTML = '';
     const baseRules = [`نوع البطولة: ${formatFormat(state.format)}`];
@@ -708,6 +686,24 @@
       });
 
     syncViewerMatches();
+
+    const body = $('standingsBody');
+    if (body.childElementCount === 0) {
+      state.players.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.name}</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
   }
 
   function renderAdminView() {
@@ -745,19 +741,33 @@
     renderLeagueView();
   }
 
+  function addEmptyMatchRow() {
+    const tbody = $('adminMatchesBody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td contenteditable="true">-</td>
+      <td contenteditable="true">-</td>
+      <td contenteditable="true">لاعب A vs لاعب B</td>
+      <td contenteditable="true">-</td>
+    `;
+    tbody.appendChild(tr);
+    syncViewerMatches();
+  }
+
   function generateLeagueSchedule(tbody, players) {
-    for (let i = 0; i < players.length; i++) {
+    players.forEach((home, i) => {
       for (let j = i + 1; j < players.length; j++) {
+        const away = players[j];
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td contenteditable="true">-</td>
           <td contenteditable="true">-</td>
-          <td contenteditable="true">${players[i]} vs ${players[j]}</td>
+          <td contenteditable="true">${home} vs ${away}</td>
           <td contenteditable="true">-</td>
         `;
         tbody.appendChild(tr);
       }
-    }
+    });
   }
 
   function generateKnockoutSchedule(tbody, players) {
@@ -777,11 +787,15 @@
 
   function generateSchedule() {
     const tbody = $('adminMatchesBody');
-    tbody.innerHTML = '';
     const players = state.players.map(p => p.name).filter(Boolean);
     if (players.length < 2) {
       alert('يجب إضافة لاعبين على الأقل لتوليد جدول المباريات.');
       return;
+    }
+    if (tbody.childElementCount > 0) {
+      const confirmClear = confirm('سيتم مسح جدول المباريات الحالي واستبداله بجديد. هل تريد المتابعة؟');
+      if (!confirmClear) return;
+      tbody.innerHTML = '';
     }
     if (state.format === 'league') {
       generateLeagueSchedule(tbody, players);
@@ -912,6 +926,7 @@
     });
 
     $('generateSchedule').onclick = generateSchedule;
+    $('addEmptyMatch').onclick = addEmptyMatchRow;
     $('recalculateStandings').onclick = recalculateStandings;
 
     $('adminToggle').onclick = () => {
@@ -925,7 +940,6 @@
         isAdmin = true;
         localStorage.setItem(ADMIN_STATE_KEY, 'true');
         renderMode();
-        // تفعيل تبويب الإدارة والانتقال إليه
         const adminBtn = $('adminTab');
         document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
         adminBtn.classList.add('active');
@@ -939,7 +953,6 @@
       isAdmin = false;
       localStorage.removeItem(ADMIN_STATE_KEY);
       renderMode();
-      // العودة لواجهة الدوري
       document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
       document.querySelector('[data-page="league"]').classList.add('active');
       showPage('league');
