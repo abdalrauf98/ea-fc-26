@@ -6,933 +6,760 @@
   <title>دوري EA FC 26 الرمضاني</title>
   <style>
     :root {
-      --bg: #020617;
-      --bg-surface: #020818;
-      --border-subtle: #1f2933;
+      --bg: #0b1120;
+      --surface: #111827;
+      --surface-alt: #020617;
+      --border: #1f2937;
       --accent: #eab308;
-      --accent-soft: rgba(234, 179, 8, 0.1);
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --text-soft: #6b7280;
-      --radius-lg: 14px;
-      --radius-md: 10px;
-      --radius-pill: 999px;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --soft: #6b7280;
+      --radius: 10px;
     }
 
     * { box-sizing: border-box; }
 
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #020617;
-      color: var(--text-main);
       margin: 0;
-      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
     header {
-      position: sticky;
-      top: 0;
-      z-index: 30;
-      backdrop-filter: blur(12px);
-      background: rgba(15,23,42,0.96);
-      border-bottom: 1px solid rgba(31,41,55,0.9);
+      background: #020617;
+      border-bottom: 1px solid var(--border);
     }
 
-    .header-inner {
+    .shell {
       max-width: 960px;
       margin: 0 auto;
-      padding: 10px 14px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      padding: 12px 14px;
     }
 
-    .hero-row {
+    .header-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      min-width: 0;
     }
 
-    .hero-main {
+    .title-group {
       display: flex;
       align-items: center;
       gap: 10px;
-      min-width: 0;
     }
 
-    .hero-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: #0b1120;
-      border: 1px solid #1f2937;
+    .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      color: var(--accent);
+      font-size: 16px;
     }
 
-    .hero-text h1 {
+    .title-text h1 {
       margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.02em;
+      font-size: 17px;
       color: var(--accent);
     }
 
-    .hero-text p {
+    .title-text p {
       margin: 2px 0 0;
-      font-size: 12px;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 11px;
+      color: var(--muted);
     }
 
-    .hero-meta {
+    .mode {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
       font-size: 11px;
-      color: var(--text-soft);
+      color: var(--muted);
     }
 
-    .mode-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 9px;
-      border-radius: var(--radius-pill);
-      border: 1px solid #1f2937;
-      background: #020818;
-      color: var(--text-muted);
-    }
-
-    .mode-dot {
-      width: 6px;
-      height: 6px;
+    .mode span {
+      padding: 2px 8px;
       border-radius: 999px;
-      background: #22c55e;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
     }
 
-    .nav-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: 4px;
-    }
-
-    .nav-pill {
-      flex: 0 0 auto;
-      border-radius: var(--radius-pill);
-      border: 1px solid #1f2937;
-      background: #020818;
-      color: var(--text-muted);
+    .mode button {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
       font-size: 11px;
-      padding: 5px 10px;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
+    }
+
+    nav {
+      margin-top: 10px;
+      display: flex;
       gap: 6px;
+      overflow-x: auto;
     }
 
-    .nav-pill span.icon { font-size: 13px; }
+    .tab {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
 
-    .nav-pill.active {
+    .tab.active {
       border-color: var(--accent);
-      background: var(--accent-soft);
       color: var(--accent);
+      background: #1f2937;
     }
 
-    .nav-pill.disabled {
+    .tab.disabled {
       opacity: 0.6;
       cursor: default;
     }
 
-    @media (max-width: 640px) {
-      .hero-row { flex-direction: column; align-items: flex-start; }
-      .hero-text p { white-space: normal; }
-      .hero-meta { align-items: flex-start; }
-    }
-
-    .page {
+    main {
       max-width: 960px;
       margin: 0 auto;
-      padding: 16px 14px 28px;
+      padding: 14px;
     }
 
-    .panel {
-      background: var(--bg-surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-subtle);
-      padding: 12px 12px 14px;
-      margin-bottom: 12px;
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 10px 10px 12px;
+      margin-bottom: 10px;
     }
 
-    .panel-header {
+    .card-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .panel-title {
-      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .card-header h2 {
+      margin: 0;
       font-size: 13px;
-      font-weight: 600;
     }
 
-    .panel-title-pill {
-      width: 3px;
-      height: 16px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    .panel-subtitle {
+    .card-header span {
       font-size: 11px;
-      color: var(--text-soft);
+      color: var(--soft);
     }
-
-    .page-section { display: none; }
-    .page-section.active { display: block; }
 
     label {
       display: block;
       font-size: 12px;
-      margin-top: 8px;
-      margin-bottom: 3px;
-      color: var(--text-main);
-    }
-
-    .field-hint {
-      font-size: 11px;
-      color: var(--text-soft);
+      margin-top: 7px;
       margin-bottom: 3px;
     }
 
     input, select, textarea {
       width: 100%;
-      padding: 7px 9px;
-      border-radius: 8px;
-      border: 1px solid #1f2933;
-      background: #020617;
-      color: var(--text-main);
-      font-size: 13px;
-      outline: none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent);
-      background: #020818;
-    }
-
-    textarea { min-height: 70px; resize: vertical; }
-
-    .field-row { display: flex; gap: 8px; }
-    .field-row > div { flex: 1; }
-
-    @media (max-width: 640px) { .field-row { flex-direction: column; } }
-
-    button {
-      border-radius: var(--radius-pill);
-      border: none;
-      padding: 7px 13px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
       font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    button.primary {
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: none;
       background: var(--accent);
       color: #111827;
+      font-size: 12px;
+      cursor: pointer;
       margin-top: 6px;
     }
 
-    button.btn-secondary {
-      background: #020818;
-      color: var(--text-main);
-      border: 1px solid #1f2937;
+    button.secondary {
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 6px;
     }
 
-    button.btn-danger {
+    button.danger {
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: none;
       background: #b91c1c;
       color: #fef2f2;
-    }
-
-    .status-text {
       font-size: 11px;
-      color: var(--accent);
-      margin-right: 6px;
+      cursor: pointer;
     }
 
-    .player-pill {
+    .small {
+      font-size: 11px;
+      color: var(--soft);
+      margin-top: 4px;
+    }
+
+    .pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 8px;
-      border-radius: var(--radius-pill);
-      border: 1px solid #1f2937;
-      background: #020818;
-      font-size: 12px;
-      margin: 2px;
-      max-width: 100%;
-    }
-
-    .player-pill-main { font-weight: 500; white-space: nowrap; }
-
-    .player-pill-note {
-      font-size: 11px;
-      color: var(--text-soft);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 140px;
-    }
-
-    .player-pill button {
-      margin-top: 0;
-      padding: 2px 7px;
-      font-size: 11px;
-    }
-
-    .small-text { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
-
-    .list-dot { list-style: none; padding: 0; margin: 4px 0 0; }
-
-    .list-dot li {
-      position: relative;
-      padding-right: 12px;
-      margin-bottom: 3px;
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .list-dot li::before {
-      content: "";
-      position: absolute;
-      right: 2px;
-      top: 7px;
-      width: 4px;
-      height: 4px;
+      padding: 3px 8px;
       border-radius: 999px;
-      background: var(--accent);
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      font-size: 11px;
+      margin: 2px;
+    }
+
+    .pill span.name {
+      font-weight: 500;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 6px;
-      font-size: 12px;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      background: #020617;
+      font-size: 11px;
     }
 
     th, td {
-      border: 1px solid #111827;
-      padding: 6px 4px;
+      border: 1px solid #020617;
+      padding: 5px 4px;
       text-align: center;
       white-space: nowrap;
     }
 
     th {
-      background: #020818;
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 11px;
+      background: #020617;
+      color: var(--muted);
     }
 
     td {
-      background: #020617;
-      font-size: 11px;
+      background: #0b1120;
     }
 
     tbody tr:nth-child(even) td {
-      background: #030712;
+      background: #020617;
     }
 
-    td[contenteditable="true"] { cursor: text; }
+    td[contenteditable="true"] {
+      cursor: text;
+    }
 
     td[contenteditable="true"]:focus {
       outline: 1px solid var(--accent);
-      background: #020818;
     }
 
-    .table-caption { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
-
-    @media (max-width: 640px) {
-      table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .list {
+      list-style: none;
+      padding: 0;
+      margin: 4px 0 0;
     }
+
+    .list li {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-
-<header>
-  <div class="header-inner">
-    <div class="hero-row">
-      <div class="hero-main">
-        <div class="hero-logo">⚽</div>
-        <div class="hero-text">
-          <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
-          <p>لوحة مبسطة لإدارة دوري الأصدقاء: عرض للمشاهد، ولوحة تحكم للمدير</p>
+  <header>
+    <div class="shell">
+      <div class="header-row">
+        <div class="title-group">
+          <div class="logo">⚽</div>
+          <div class="title-text">
+            <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
+            <p>عرض بسيط للدوري + صفحة إدارة للمنظّم</p>
+          </div>
+        </div>
+        <div class="mode">
+          <span id="modeLabel">وضع: مشاهد</span>
+          <button id="adminToggle">دخول المدير</button>
         </div>
       </div>
-      <div class="hero-meta">
-        <div class="mode-chip" id="modeChip">
-          <span class="mode-dot"></span>
-          <span id="modeText">وضع: مشاهد</span>
-        </div>
-        <button id="adminToggle" class="btn-secondary" style="padding:4px 10px;margin-top:6px;font-size:11px;">دخول المدير</button>
-      </div>
+      <nav>
+        <button class="tab active" data-page="league">الدوري (للمشاهد)</button>
+        <button class="tab" data-page="admin" id="adminTab">الإدارة (للمنظّم)</button>
+      </nav>
     </div>
-    <nav class="nav-row">
-      <button class="nav-pill active" data-page="league">
-        <span class="icon">📊</span>
-        <span>الدوري (عرض للمشاهد)</span>
-      </button>
-      <button class="nav-pill" data-page="admin" id="adminTab">
-        <span class="icon">⚙️</span>
-        <span>الإدارة (للمنظّم)</span>
-      </button>
-    </nav>
-  </div>
-</header>
+  </header>
 
-<div class="page">
-  <!-- واجهة المشاهد -->
-  <div class="page-section active" id="page-league">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>ترتيب الدوري</span>
+  <main>
+    <!-- صفحة المشاهد -->
+    <section id="page-league">
+      <div class="card">
+        <div class="card-header">
+          <h2>ترتيب الدوري</h2>
+          <span>مُحتسب من نتائج المباريات</span>
         </div>
-        <span class="panel-subtitle">مُحتسب بناءً على نتائج المباريات المدخلة من المدير</span>
+        <table>
+          <thead>
+            <tr>
+              <th>اللاعب</th>
+              <th>لعب</th>
+              <th>فاز</th>
+              <th>تعادل</th>
+              <th>خسر</th>
+              <th>له</th>
+              <th>عليه</th>
+              <th>النقاط</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody"></tbody>
+        </table>
+        <div class="small">التحديث يتم من صفحة الإدارة.</div>
       </div>
-      <table id="standingsTable">
-        <thead>
-          <tr>
-            <th>اللاعب</th>
-            <th>لعب</th>
-            <th>فاز</th>
-            <th>تعادل</th>
-            <th>خسر</th>
-            <th>له</th>
-            <th>عليه</th>
-            <th>النقاط</th>
-          </tr>
-        </thead>
-        <tbody id="standingsBody"></tbody>
-      </table>
-      <div class="small-text">يتم تحديث الترتيب من صفحة الإدارة فقط.</div>
-    </div>
 
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>جدول المباريات والنتائج</span>
+      <div class="card">
+        <div class="card-header">
+          <h2>جدول المباريات</h2>
+          <span>يُدار من صفحة الإدارة</span>
         </div>
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الوقت</th>
+              <th>المباراة</th>
+              <th>النتيجة</th>
+            </tr>
+          </thead>
+          <tbody id="viewerMatchesBody"></tbody>
+        </table>
       </div>
-      <table id="viewerMatchesTable">
-        <thead>
-          <tr>
-            <th>التاريخ</th>
-            <th>الوقت</th>
-            <th>المباراة</th>
-            <th>النتيجة</th>
-          </tr>
-        </thead>
-        <tbody id="viewerMatchesBody"></tbody>
-      </table>
-      <div class="table-caption">تعديل المباريات والنتائج يتم من لوحة الإدارة.</div>
-    </div>
 
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>قوانين الدوري</span>
+      <div class="card">
+        <div class="card-header">
+          <h2>قوانين الدوري</h2>
         </div>
+        <ul class="list" id="rulesDisplay"></ul>
       </div>
-      <ul class="list-dot" id="rulesDisplay"></ul>
-    </div>
-  </div>
+    </section>
 
-  <!-- واجهة المدير -->
-  <div class="page-section" id="page-admin">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>إعدادات البطولة</span>
+    <!-- صفحة الإدارة -->
+    <section id="page-admin" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>إعدادات البطولة</h2>
+          <span>اسم الدوري ونوع البطولة</span>
         </div>
-        <span class="panel-subtitle">هذه الصفحة خاصة بالمنظّم فقط</span>
+        <label>اسم الدوري</label>
+        <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
+        <label>نوع البطولة</label>
+        <select id="format">
+          <option value="league">دوري (الجميع ضد الجميع)</option>
+          <option value="knockout">كأس – إقصائي مباشر</option>
+          <option value="groups-knockout">مجموعات ثم كأس</option>
+        </select>
+        <label>مدة الدوري (اختياري)</label>
+        <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان أو من 10 إلى 20 رمضان">
       </div>
 
-      <label>اسم الدوري</label>
-      <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
-      <div class="field-hint">مثال: دوري الأصدقاء الرمضاني 1447هـ</div>
-
-      <label>نوع البطولة</label>
-      <select id="format">
-        <option value="league">دوري (الجميع يلعب ضد الجميع)</option>
-        <option value="knockout">كأس – إقصائي مباشر</option>
-        <option value="groups-knockout">مجموعات ثم كأس</option>
-      </select>
-
-      <label>مدة الدوري (اختياري)</label>
-      <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان أو من 10 إلى 20 رمضان">
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>اللاعبون</span>
+      <div class="card">
+        <div class="card-header">
+          <h2>اللاعبون</h2>
+          <span>إضافة أو حذف اللاعبين</span>
         </div>
-        <span class="panel-subtitle">إضافة أو حذف اللاعبين المشاركين في الدوري</span>
+        <label>اسم اللاعب / الكنية</label>
+        <input id="playerName" type="text" placeholder="مثال: أبو فلان أو PSN ID">
+        <label>ملاحظة (اختياري)</label>
+        <input id="playerNote" type="text" placeholder="مثال: الفريق المفضل أو أي تعليق بسيط">
+        <button id="addPlayer" class="primary">إضافة لاعب</button>
+        <div id="playersList" class="small" style="margin-top:6px;"></div>
       </div>
 
-      <label>اسم اللاعب / الكنية</label>
-      <input id="playerName" type="text" placeholder="مثال: أبو فلان أو PSN ID">
-
-      <label>ملاحظة (اختياري)</label>
-      <input id="playerNote" type="text" placeholder="مثال: الفريق المفضل أو أي تعليق بسيط">
-
-      <button id="addPlayer">إضافة لاعب</button>
-      <div class="small-text">يمكن تعديل القائمة في أي وقت.</div>
-
-      <div id="playersList" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>قوانين الدوري</span>
+      <div class="card">
+        <div class="card-header">
+          <h2>قوانين الدوري</h2>
+          <span>سطر لكل قاعدة</span>
         </div>
-        <span class="panel-subtitle">اكتب القواعد الرئيسية، بما فيها مدة الشوط ومستوى الصعوبة</span>
+        <label>القوانين</label>
+        <textarea id="specialRules" placeholder="مثال: مدة الشوط 6 دقائق&#10;مثال: المستوى محترف&#10;مثال: لا يمكن تكرار نفس الفريق في نفس الجولة"></textarea>
       </div>
-      <label>القوانين (سطر لكل قاعدة)</label>
-      <textarea id="specialRules" placeholder="مثال: مدة الشوط 6 دقائق&#10;مثال: المستوى محترف&#10;مثال: لا يمكن تكرار نفس الفريق في نفس الجولة"></textarea>
-    </div>
 
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>إدارة جدول المباريات</span>
+      <div class="card">
+        <div class="card-header">
+          <h2>جدول المباريات</h2>
+          <span>توليد أو تعديل يدوي</span>
         </div>
-        <span class="panel-subtitle">قم بتوليد الجدول أو إضافة مباريات يدوياً، ثم عدّل النتائج</span>
+        <button id="generateSchedule" class="secondary">توليد جدول حسب نوع البطولة</button>
+        <button id="addEmptyMatch" class="secondary">إضافة مباراة يدويًا</button>
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الوقت</th>
+              <th>المباراة</th>
+              <th>النتيجة</th>
+            </tr>
+          </thead>
+          <tbody id="adminMatchesBody"></tbody>
+        </table>
+        <div class="small">لن يتم مسح الجدول الحالي عند التوليد إلا بعد تأكيدك. اكتب النتيجة بصيغة 1-3 أو 0-0.</div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px;">
-        <button id="generateSchedule" class="btn-secondary">توليد جدول حسب نوع البطولة</button>
-        <button id="addEmptyMatch" class="btn-secondary">إضافة مباراة يدويًا</button>
-      </div>
-      <table id="adminMatchesTable">
-        <thead>
-          <tr>
-            <th>التاريخ</th>
-            <th>الوقت</th>
-            <th>المباراة</th>
-            <th>النتيجة</th>
-          </tr>
-        </thead>
-        <tbody id="adminMatchesBody"></tbody>
-      </table>
-      <div class="table-caption">لن يتم مسح الجدول الحالي عند التوليد إلا بعد تأكيدك. اكتب النتيجة بصيغة 1-3 أو 0-0.</div>
-    </div>
 
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>أدوات المنظّم</span>
+      <div class="card">
+        <div class="card-header">
+          <h2>أدوات المنظّم</h2>
         </div>
+        <button id="saveSettings" class="primary">حفظ الإعدادات</button>
+        <button id="recalculateStandings" class="secondary">تحديث الترتيب من النتائج</button>
+        <button id="adminLogout" class="secondary">تسجيل خروج المدير</button>
+        <span id="saveStatus" class="small"></span>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-        <button id="saveSettings">حفظ الإعدادات</button>
-        <button id="recalculateStandings" class="btn-secondary">تحديث الترتيب من النتائج</button>
-        <button id="adminLogout" class="btn-secondary">تسجيل خروج المدير</button>
-      </div>
-      <span class="status-text" id="saveStatus"></span>
-      <div class="small-text">كل الإعدادات محفوظة محلياً في هذا المتصفح.</div>
-    </div>
-  </div>
-</div>
+    </section>
+  </main>
 
-<script>
-  const STORAGE_KEY = 'ea_fc_26_tournament';
-  const ADMIN_STATE_KEY = 'ea_fc_26_is_admin';
-  const ADMIN_PASSWORD = 'Qq112233';
+  <script>
+    const STORAGE_KEY = 'ea_fc_26_tournament';
+    const ADMIN_STATE_KEY = 'ea_fc_26_is_admin';
+    const ADMIN_PASSWORD = 'Qq112233';
 
-  const state = {
-    tournamentName: 'دوري EA FC 26 الرمضاني',
-    format: 'league',
-    duration: '',
-    specialRules: [],
-    players: []
-  };
+    const state = {
+      tournamentName: 'دوري EA FC 26 الرمضاني',
+      format: 'league',
+      duration: '',
+      specialRules: [],
+      players: []
+    };
 
-  let isAdmin = false;
+    let isAdmin = false;
 
-  function loadState() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) Object.assign(state, JSON.parse(saved));
-      const adminSaved = localStorage.getItem(ADMIN_STATE_KEY);
-      isAdmin = adminSaved === 'true';
-    } catch (e) {
-      console.warn('Failed to load state', e);
-    }
-  }
-
-  function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  function $(id) { return document.getElementById(id); }
-
-  function formatFormat(format) {
-    switch (format) {
-      case 'league': return 'دوري (الجميع ضد الجميع)';
-      case 'knockout': return 'كأس – إقصائي مباشر';
-      case 'groups-knockout': return 'مجموعات ثم كأس';
-      default: return 'غير محدد';
-    }
-  }
-
-  function renderMode() {
-    const modeText = $('modeText');
-    const adminTab = $('adminTab');
-    const adminToggle = $('adminToggle');
-    if (isAdmin) {
-      modeText.textContent = 'وضع: مدير';
-      adminToggle.textContent = 'دخول المدير مفعل';
-      adminTab.classList.remove('disabled');
-    } else {
-      modeText.textContent = 'وضع: مشاهد';
-      adminToggle.textContent = 'دخول المدير';
-      adminTab.classList.add('disabled');
-    }
-  }
-
-  function syncViewerMatches() {
-    const adminBody = $('adminMatchesBody');
-    const viewerBody = $('viewerMatchesBody');
-    viewerBody.innerHTML = '';
-    adminBody.querySelectorAll('tr').forEach(row => {
-      const cells = row.querySelectorAll('td');
-      if (cells.length < 4) return;
-      const tr = document.createElement('tr');
-      for (let i = 0; i < 4; i++) {
-        const td = document.createElement('td');
-        td.textContent = cells[i].textContent;
-        tr.appendChild(td);
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) Object.assign(state, JSON.parse(saved));
+        isAdmin = localStorage.getItem(ADMIN_STATE_KEY) === 'true';
+      } catch (e) {
+        console.warn('Failed to load state', e);
       }
-      viewerBody.appendChild(tr);
-    });
-  }
+    }
 
-  function renderLeagueView() {
-    const rulesDisplay = $('rulesDisplay');
-    rulesDisplay.innerHTML = '';
-    const baseRules = [`نوع البطولة: ${formatFormat(state.format)}`];
-    baseRules.concat(state.specialRules.filter(r => r.trim().length > 0))
-      .forEach(rule => {
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function $(id) { return document.getElementById(id); }
+
+    function formatFormat(f) {
+      switch (f) {
+        case 'league': return 'دوري (الجميع ضد الجميع)';
+        case 'knockout': return 'كأس – إقصائي مباشر';
+        case 'groups-knockout': return 'مجموعات ثم كأس';
+        default: return 'غير محدد';
+      }
+    }
+
+    function renderMode() {
+      $('modeLabel').textContent = isAdmin ? 'وضع: مدير' : 'وضع: مشاهد';
+      $('adminTab').classList.toggle('disabled', !isAdmin);
+      $('adminToggle').textContent = isAdmin ? 'دخول المدير مفعل' : 'دخول المدير';
+    }
+
+    function syncViewerMatches() {
+      const adminBody = $('adminMatchesBody');
+      const viewerBody = $('viewerMatchesBody');
+      viewerBody.innerHTML = '';
+      adminBody.querySelectorAll('tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 4) return;
+        const tr = document.createElement('tr');
+        for (let i = 0; i < 4; i++) {
+          const td = document.createElement('td');
+          td.textContent = cells[i].textContent;
+          tr.appendChild(td);
+        }
+        viewerBody.appendChild(tr);
+      });
+    }
+
+    function renderLeagueView() {
+      const rulesDisplay = $('rulesDisplay');
+      rulesDisplay.innerHTML = '';
+      const base = [`نوع البطولة: ${formatFormat(state.format)}`];
+      base.concat(state.specialRules.filter(r => r.trim().length > 0)).forEach(rule => {
         const li = document.createElement('li');
         li.textContent = rule;
         rulesDisplay.appendChild(li);
       });
 
-    syncViewerMatches();
+      syncViewerMatches();
 
-    const body = $('standingsBody');
-    if (body.childElementCount === 0) {
-      state.players.forEach(p => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${p.name}</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-          <td>0</td>
-        `;
-        body.appendChild(tr);
+      const body = $('standingsBody');
+      if (body.childElementCount === 0) {
+        state.players.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${p.name}</td>
+            <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+          `;
+          body.appendChild(tr);
+        });
+      }
+    }
+
+    function renderAdminView() {
+      $('tournamentName').value = state.tournamentName;
+      $('format').value = state.format;
+      $('duration').value = state.duration;
+      $('specialRules').value = state.specialRules.join('\n');
+
+      const list = $('playersList');
+      list.innerHTML = '';
+      state.players.forEach((p, idx) => {
+        const pill = document.createElement('span');
+        pill.className = 'pill';
+        pill.innerHTML = `<span class="name">${p.name}</span><span>${p.note || ''}</span>`;
+        const btn = document.createElement('button');
+        btn.className = 'danger';
+        btn.textContent = 'حذف';
+        btn.onclick = () => {
+          state.players.splice(idx, 1);
+          saveState();
+          renderAll();
+        };
+        pill.appendChild(btn);
+        list.appendChild(pill);
       });
     }
-  }
 
-  function renderAdminView() {
-    $('tournamentName').value = state.tournamentName;
-    $('format').value = state.format;
-    $('duration').value = state.duration;
-    $('specialRules').value = state.specialRules.join('\n');
+    function renderAll() {
+      $('title-display').textContent = state.tournamentName || 'دوري EA FC 26 الرمضاني';
+      renderMode();
+      renderAdminView();
+      renderLeagueView();
+    }
 
-    const playersList = $('playersList');
-    playersList.innerHTML = '';
-    state.players.forEach((p, index) => {
-      const div = document.createElement('div');
-      div.className = 'player-pill';
-      div.innerHTML = `
-        <span class="player-pill-main">${p.name}</span>
-        <span class="player-pill-note">${p.note || ''}</span>
+    function addEmptyMatchRow() {
+      const tbody = $('adminMatchesBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td contenteditable="true">-</td>
+        <td contenteditable="true">-</td>
+        <td contenteditable="true">لاعب A vs لاعب B</td>
+        <td contenteditable="true">-</td>
       `;
-      const btn = document.createElement('button');
-      btn.className = 'btn-danger';
-      btn.textContent = 'حذف';
-      btn.onclick = () => {
-        state.players.splice(index, 1);
-        saveState();
-        renderAll();
-      };
-      div.appendChild(btn);
-      playersList.appendChild(div);
-    });
-  }
+      tbody.appendChild(tr);
+      syncViewerMatches();
+    }
 
-  function renderAll() {
-    $('title-display').textContent = state.tournamentName || 'دوري EA FC 26 الرمضاني';
-    renderMode();
-    renderAdminView();
-    renderLeagueView();
-  }
+    function generateLeagueSchedule(tbody, players) {
+      players.forEach((home, i) => {
+        for (let j = i + 1; j < players.length; j++) {
+          const away = players[j];
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td contenteditable="true">-</td>
+            <td contenteditable="true">-</td>
+            <td contenteditable="true">${home} vs ${away}</td>
+            <td contenteditable="true">-</td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+    }
 
-  function addEmptyMatchRow() {
-    const tbody = $('adminMatchesBody');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td contenteditable="true">-</td>
-      <td contenteditable="true">-</td>
-      <td contenteditable="true">لاعب A vs لاعب B</td>
-      <td contenteditable="true">-</td>
-    `;
-    tbody.appendChild(tr);
-    syncViewerMatches();
-  }
-
-  function generateLeagueSchedule(tbody, players) {
-    players.forEach((home, i) => {
-      for (let j = i + 1; j < players.length; j++) {
-        const away = players[j];
+    function generateKnockoutSchedule(tbody, players) {
+      for (let i = 0; i < players.length; i += 2) {
+        const p1 = players[i];
+        const p2 = players[i + 1];
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td contenteditable="true">-</td>
           <td contenteditable="true">-</td>
-          <td contenteditable="true">${home} vs ${away}</td>
+          <td contenteditable="true">${p1}${p2 ? ' vs ' + p2 : ' (يتأهل تلقائياً)'} </td>
           <td contenteditable="true">-</td>
         `;
         tbody.appendChild(tr);
       }
-    });
-  }
-
-  function generateKnockoutSchedule(tbody, players) {
-    for (let i = 0; i < players.length; i += 2) {
-      const p1 = players[i];
-      const p2 = players[i + 1];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td contenteditable="true">-</td>
-        <td contenteditable="true">-</td>
-        <td contenteditable="true">${p1}${p2 ? ' vs ' + p2 : ' (يتأهل تلقائياً)'} </td>
-        <td contenteditable="true">-</td>
-      `;
-      tbody.appendChild(tr);
-    }
-  }
-
-  function generateSchedule() {
-    const tbody = $('adminMatchesBody');
-    const players = state.players.map(p => p.name).filter(Boolean);
-    if (players.length < 2) {
-      alert('يجب إضافة لاعبين على الأقل لتوليد جدول المباريات.');
-      return;
-    }
-    if (tbody.childElementCount > 0) {
-      const confirmClear = confirm('سيتم مسح جدول المباريات الحالي واستبداله بجديد. هل تريد المتابعة؟');
-      if (!confirmClear) return;
-      tbody.innerHTML = '';
-    }
-    if (state.format === 'league') {
-      generateLeagueSchedule(tbody, players);
-    } else if (state.format === 'knockout') {
-      generateKnockoutSchedule(tbody, players);
-    } else {
-      generateLeagueSchedule(tbody, players);
-    }
-    syncViewerMatches();
-  }
-
-  function parseResult(resultStr) {
-    const m = resultStr.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
-    if (!m) return null;
-    return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
-  }
-
-  function recalculateStandings() {
-    const stats = {};
-    state.players.forEach(p => {
-      stats[p.name] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
-    });
-    const rows = $('adminMatchesBody').querySelectorAll('tr');
-    rows.forEach(row => {
-      const cells = row.querySelectorAll('td');
-      if (cells.length < 4) return;
-      const matchCell = cells[2].textContent || '';
-      const resultCell = cells[3].textContent || '';
-      if (!matchCell.includes('vs')) return;
-      const [homeNameRaw, awayNameRaw] = matchCell.split('vs');
-      const homeName = homeNameRaw.trim();
-      const awayName = awayNameRaw.replace('(يتأهل تلقائياً)', '').trim();
-      const res = parseResult(resultCell);
-      if (!res) return;
-      if (!stats[homeName] || !stats[awayName]) return;
-      const { home, away } = res;
-      stats[homeName].played++;
-      stats[awayName].played++;
-      stats[homeName].gf += home;
-      stats[homeName].ga += away;
-      stats[awayName].gf += away;
-      stats[awayName].ga += home;
-      if (home > away) {
-        stats[homeName].won++;
-        stats[homeName].pts += 3;
-        stats[awayName].lost++;
-      } else if (home < away) {
-        stats[awayName].won++;
-        stats[awayName].pts += 3;
-        stats[homeName].lost++;
-      } else {
-        stats[homeName].drawn++;
-        stats[awayName].drawn++;
-        stats[homeName].pts += 1;
-        stats[awayName].pts += 1;
-      }
-    });
-    const body = $('standingsBody');
-    body.innerHTML = '';
-    const entries = Object.entries(stats).sort((a, b) => b[1].pts - a[1].pts || (b[1].gf - b[1].ga) - (a[1].gf - a[1].ga));
-    entries.forEach(([name, s]) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${name}</td>
-        <td>${s.played}</td>
-        <td>${s.won}</td>
-        <td>${s.drawn}</td>
-        <td>${s.lost}</td>
-        <td>${s.gf}</td>
-        <td>${s.ga}</td>
-        <td>${s.pts}</td>
-      `;
-      body.appendChild(tr);
-    });
-  }
-
-  function init() {
-    loadState();
-    renderAll();
-
-    $('saveSettings').onclick = () => {
-      state.tournamentName = $('tournamentName').value.trim() || state.tournamentName;
-      state.format = $('format').value;
-      state.duration = $('duration').value.trim();
-      state.specialRules = $('specialRules').value
-        .split('\n')
-        .map(r => r.trim())
-        .filter(r => r.length > 0);
-      saveState();
-      renderAll();
-      $('saveStatus').textContent = 'تم الحفظ ✅';
-      setTimeout(() => $('saveStatus').textContent = '', 2200);
-    };
-
-    $('addPlayer').onclick = () => {
-      const name = $('playerName').value.trim();
-      const note = $('playerNote').value.trim();
-      if (!name) return;
-      state.players.push({ name, note });
-      $('playerName').value = '';
-      $('playerNote').value = '';
-      saveState();
-      renderAll();
-    };
-
-    const navButtons = document.querySelectorAll('.nav-pill');
-    const pageSections = {
-      league: document.getElementById('page-league'),
-      admin: document.getElementById('page-admin')
-    };
-
-    function showPage(key) {
-      if (key === 'admin' && !isAdmin) return;
-      Object.keys(pageSections).forEach(k => {
-        pageSections[k].classList.toggle('active', k === key);
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const page = btn.getAttribute('data-page');
-        if (page === 'admin' && !isAdmin) return;
-        navButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        showPage(page);
-      });
-    });
-
-    $('generateSchedule').onclick = generateSchedule;
-    $('addEmptyMatch').onclick = addEmptyMatchRow;
-    $('recalculateStandings').onclick = recalculateStandings;
-
-    $('adminToggle').onclick = () => {
-      if (isAdmin) {
-        alert('أنت مسجل كمدير حالياً. يمكنك استخدام صفحة الإدارة أو تسجيل الخروج منها.');
+    function generateSchedule() {
+      const tbody = $('adminMatchesBody');
+      const players = state.players.map(p => p.name).filter(Boolean);
+      if (players.length < 2) {
+        alert('يجب إضافة لاعبين على الأقل لتوليد جدول المباريات.');
         return;
       }
-      const input = prompt('أدخل كلمة مرور المدير:');
-      if (input === null) return;
-      if (input === ADMIN_PASSWORD) {
-        isAdmin = true;
-        localStorage.setItem(ADMIN_STATE_KEY, 'true');
-        renderMode();
-        const adminBtn = $('adminTab');
-        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-        adminBtn.classList.add('active');
-        showPage('admin');
-      } else {
-        alert('كلمة المرور غير صحيحة.');
+      if (tbody.childElementCount > 0) {
+        const confirmClear = confirm('سيتم مسح جدول المباريات الحالي واستبداله بجديد. هل تريد المتابعة؟');
+        if (!confirmClear) return;
+        tbody.innerHTML = '';
       }
-    };
+      if (state.format === 'league') {
+        generateLeagueSchedule(tbody, players);
+      } else if (state.format === 'knockout') {
+        generateKnockoutSchedule(tbody, players);
+      } else {
+        generateLeagueSchedule(tbody, players);
+      }
+      syncViewerMatches();
+    }
 
-    $('adminLogout').onclick = () => {
-      isAdmin = false;
-      localStorage.removeItem(ADMIN_STATE_KEY);
-      renderMode();
-      document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-      document.querySelector('[data-page="league"]').classList.add('active');
-      showPage('league');
-    };
-  }
+    function parseResult(str) {
+      const m = str.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
+      if (!m) return null;
+      return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
+    }
 
-  document.addEventListener('DOMContentLoaded', init);
-</script>
+    function recalculateStandings() {
+      const stats = {};
+      state.players.forEach(p => {
+        stats[p.name] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
+      });
+      const rows = $('adminMatchesBody').querySelectorAll('tr');
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length < 4) return;
+        const matchCell = cells[2].textContent || '';
+        const resultCell = cells[3].textContent || '';
+        if (!matchCell.includes('vs')) return;
+        const [homeRaw, awayRaw] = matchCell.split('vs');
+        const homeName = homeRaw.trim();
+        const awayName = awayRaw.replace('(يتأهل تلقائياً)', '').trim();
+        const res = parseResult(resultCell);
+        if (!res) return;
+        if (!stats[homeName] || !stats[awayName]) return;
+        const { home, away } = res;
+        stats[homeName].played++;
+        stats[awayName].played++;
+        stats[homeName].gf += home;
+        stats[homeName].ga += away;
+        stats[awayName].gf += away;
+        stats[awayName].ga += home;
+        if (home > away) {
+          stats[homeName].won++;
+          stats[homeName].pts += 3;
+          stats[awayName].lost++;
+        } else if (home < away) {
+          stats[awayName].won++;
+          stats[awayName].pts += 3;
+          stats[homeName].lost++;
+        } else {
+          stats[homeName].drawn++;
+          stats[awayName].drawn++;
+          stats[homeName].pts += 1;
+          stats[awayName].pts += 1;
+        }
+      });
+      const body = $('standingsBody');
+      body.innerHTML = '';
+      const entries = Object.entries(stats).sort((a, b) => b[1].pts - a[1].pts || (b[1].gf - b[1].ga) - (a[1].gf - a[1].ga));
+      entries.forEach(([name, s]) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${name}</td>
+          <td>${s.played}</td>
+          <td>${s.won}</td>
+          <td>${s.drawn}</td>
+          <td>${s.lost}</td>
+          <td>${s.gf}</td>
+          <td>${s.ga}</td>
+          <td>${s.pts}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
 
+    function init() {
+      loadState();
+      renderAll();
+
+      $('saveSettings').onclick = () => {
+        state.tournamentName = $('tournamentName').value.trim() || state.tournamentName;
+        state.format = $('format').value;
+        state.duration = $('duration').value.trim();
+        state.specialRules = $('specialRules').value.split('\n').map(r => r.trim()).filter(Boolean);
+        saveState();
+        renderAll();
+        $('saveStatus').textContent = 'تم الحفظ ✅';
+        setTimeout(() => $('saveStatus').textContent = '', 2000);
+      };
+
+      $('addPlayer').onclick = () => {
+        const name = $('playerName').value.trim();
+        const note = $('playerNote').value.trim();
+        if (!name) return;
+        state.players.push({ name, note });
+        $('playerName').value = '';
+        $('playerNote').value = '';
+        saveState();
+        renderAll();
+      };
+
+      document.querySelectorAll('.tab').forEach(btn => {
+        btn.onclick = () => {
+          const page = btn.getAttribute('data-page');
+          if (page === 'admin' && !isAdmin) return;
+          document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          $('page-league').classList.toggle('hidden', page !== 'league');
+          $('page-admin').classList.toggle('hidden', page !== 'admin');
+        };
+      });
+
+      $('generateSchedule').onclick = generateSchedule;
+      $('addEmptyMatch').onclick = addEmptyMatchRow;
+      $('recalculateStandings').onclick = recalculateStandings;
+
+      $('adminToggle').onclick = () => {
+        if (isAdmin) {
+          alert('أنت مسجل كمدير حالياً. يمكنك استخدام صفحة الإدارة أو تسجيل الخروج.');
+          return;
+        }
+        const input = prompt('أدخل كلمة مرور المدير:');
+        if (input === null) return;
+        if (input === ADMIN_PASSWORD) {
+          isAdmin = true;
+          localStorage.setItem(ADMIN_STATE_KEY, 'true');
+          renderMode();
+          document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+          $('adminTab').classList.add('active');
+          $('page-league').classList.add('hidden');
+          $('page-admin').classList.remove('hidden');
+        } else {
+          alert('كلمة المرور غير صحيحة.');
+        }
+      };
+
+      $('adminLogout').onclick = () => {
+        isAdmin = false;
+        localStorage.removeItem(ADMIN_STATE_KEY);
+        renderMode();
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelector('.tab[data-page="league"]').classList.add('active');
+        $('page-league').classList.remove('hidden');
+        $('page-admin').classList.add('hidden');
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
