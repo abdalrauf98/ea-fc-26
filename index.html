@@ -24,7 +24,7 @@
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
+      background: radial-gradient(circle at top, #0b1120 0, --bg 55%, #000 100%);
       color: var(--text-main);
       margin: 0;
       min-height: 100vh;
@@ -102,6 +102,23 @@
       color: var(--text-soft);
     }
 
+    .mode-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at 0 0, rgba(148,163,184,0.18), rgba(15,23,42,0.95));
+    }
+
+    .mode-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
     .nav-row {
       display: flex;
       align-items: center;
@@ -133,6 +150,11 @@
       border-color: rgba(234,179,8,0.9);
       background: radial-gradient(circle at top left, rgba(234,179,8,0.22), rgba(15,23,42,0.98));
       color: var(--accent-strong);
+    }
+
+    .nav-pill.disabled {
+      opacity: 0.6;
+      cursor: default;
     }
 
     @media (max-width: 640px) {
@@ -394,7 +416,11 @@
         </div>
       </div>
       <div class="hero-meta">
-        <span>واجهتان: للمشاهدة وللإدارة</span>
+        <div class="mode-chip" id="modeChip">
+          <span class="mode-dot"></span>
+          <span id="modeText">وضع: مشاهد</span>
+        </div>
+        <button id="adminToggle" class="btn-secondary" style="padding:4px 10px;margin-top:6px;font-size:11px;box-shadow:none;">دخول المدير</button>
       </div>
     </div>
     <nav class="nav-row">
@@ -402,7 +428,7 @@
         <span class="icon">🏆</span>
         <span>الدوري (عرض للمشاهد)</span>
       </button>
-      <button class="nav-pill" data-page="admin">
+      <button class="nav-pill" data-page="admin" id="adminTab">
         <span class="icon">⚙️</span>
         <span>الإدارة (للمنظّم)</span>
       </button>
@@ -446,7 +472,7 @@
           <span>جدول المباريات والنتائج</span>
         </div>
       </div>
-      <table id="matchesTable">
+      <table id="viewerMatchesTable">
         <thead>
           <tr>
             <th>التاريخ</th>
@@ -455,16 +481,10 @@
             <th>النتيجة</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td contenteditable="true">-</td>
-            <td contenteditable="true">-</td>
-            <td contenteditable="true">لاعب 1 vs لاعب 2</td>
-            <td contenteditable="true">-</td>
-          </tr>
+        <tbody id="viewerMatchesBody">
         </tbody>
       </table>
-      <div class="table-caption">المنظّم يملأ النتائج بصيغة 1-3 أو 0-0 ليتم احتسابها في الترتيب.</div>
+      <div class="table-caption">هذه البيانات يتم تعديلها من واجهة الإدارة فقط.</div>
     </div>
 
     <div class="panel">
@@ -478,7 +498,7 @@
     </div>
   </div>
 
-  <!-- واجهة المدير: إعدادات + لاعبين + قوانين + أزرار التوليد/التحديث -->
+  <!-- واجهة المدير: إعدادات + لاعبين + قوانين + جدول المباريات + أدوات -->
   <div class="page-section" id="page-admin">
     <div class="panel panel-soft">
       <div class="panel-header">
@@ -541,22 +561,54 @@
       <div class="panel-header">
         <div class="panel-title">
           <span class="panel-title-pill"></span>
+          <span>إدارة جدول المباريات</span>
+        </div>
+        <span class="panel-subtitle">قم بتوليد الجدول وتعديل النتائج من هنا</span>
+      </div>
+      <button id="generateSchedule" class="btn-secondary">توليد جدول المباريات حسب نوع البطولة</button>
+      <table id="adminMatchesTable">
+        <thead>
+          <tr>
+            <th>التاريخ</th>
+            <th>الوقت</th>
+            <th>المباراة</th>
+            <th>النتيجة</th>
+          </tr>
+        </thead>
+        <tbody id="adminMatchesBody">
+          <tr>
+            <td contenteditable="true">-</td>
+            <td contenteditable="true">-</td>
+            <td contenteditable="true">لاعب 1 vs لاعب 2</td>
+            <td contenteditable="true">-</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="table-caption">اكتب النتيجة بصيغة 1-3 أو 0-0 ليتم احتسابها في الترتيب.</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
           <span>أدوات المنظّم</span>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
         <button id="saveSettings">حفظ الإعدادات</button>
-        <button id="generateSchedule" class="btn-secondary">توليد جدول المباريات حسب نوع البطولة</button>
         <button id="recalculateStandings" class="btn-secondary">تحديث الترتيب من النتائج</button>
+        <button id="adminLogout" class="btn-secondary">تسجيل خروج المدير</button>
       </div>
       <span class="status-text" id="saveStatus"></span>
-      <div class="small-text">كل الإعدادات واللاعبين محفوظة محلياً في هذا المتصفح.</div>
+      <div class="small-text">كل الإعدادات محفوظة محلياً في هذا المتصفح.</div>
     </div>
   </div>
 </div>
 
 <script>
   const STORAGE_KEY = 'ea_fc_26_tournament';
+  const ADMIN_STATE_KEY = 'ea_fc_26_is_admin';
+  const ADMIN_PASSWORD = 'Qq112233';
 
   const state = {
     tournamentName: 'دوري EA FC 26 الرمضاني',
@@ -566,11 +618,14 @@
     players: []
   };
 
+  let isAdmin = false;
+
   function loadState() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return;
-      Object.assign(state, JSON.parse(saved));
+      if (saved) Object.assign(state, JSON.parse(saved));
+      const adminSaved = localStorage.getItem(ADMIN_STATE_KEY);
+      isAdmin = adminSaved === 'true';
     } catch (e) {
       console.warn('Failed to load state', e);
     }
@@ -591,8 +646,40 @@
     }
   }
 
+  function renderMode() {
+    const modeText = $('modeText');
+    const adminTab = $('adminTab');
+    const adminToggle = $('adminToggle');
+    if (isAdmin) {
+      modeText.textContent = 'وضع: مدير';
+      adminToggle.textContent = 'تسجيل دخول المدير مفعل';
+      adminToggle.classList.add('btn-secondary');
+      adminTab.classList.remove('disabled');
+    } else {
+      modeText.textContent = 'وضع: مشاهد';
+      adminToggle.textContent = 'دخول المدير';
+      adminTab.classList.add('disabled');
+    }
+  }
+
+  function syncViewerMatches() {
+    const adminBody = $('adminMatchesBody');
+    const viewerBody = $('viewerMatchesBody');
+    viewerBody.innerHTML = '';
+    adminBody.querySelectorAll('tr').forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length < 4) return;
+      const tr = document.createElement('tr');
+      for (let i = 0; i < 4; i++) {
+        const td = document.createElement('td');
+        td.textContent = cells[i].textContent;
+        tr.appendChild(td);
+      }
+      viewerBody.appendChild(tr);
+    });
+  }
+
   function renderLeagueView() {
-    // Standings skeleton
     const body = $('standingsBody');
     body.innerHTML = '';
     state.players.forEach(p => {
@@ -610,18 +697,17 @@
       body.appendChild(tr);
     });
 
-    // Rules
     const rulesDisplay = $('rulesDisplay');
     rulesDisplay.innerHTML = '';
-    const baseRules = [
-      `نوع البطولة: ${formatFormat(state.format)}`
-    ];
+    const baseRules = [`نوع البطولة: ${formatFormat(state.format)}`];
     baseRules.concat(state.specialRules.filter(r => r.trim().length > 0))
       .forEach(rule => {
         const li = document.createElement('li');
         li.textContent = rule;
         rulesDisplay.appendChild(li);
       });
+
+    syncViewerMatches();
   }
 
   function renderAdminView() {
@@ -654,8 +740,9 @@
 
   function renderAll() {
     $('title-display').textContent = state.tournamentName || 'دوري EA FC 26 الرمضاني';
-    renderLeagueView();
+    renderMode();
     renderAdminView();
+    renderLeagueView();
   }
 
   function generateLeagueSchedule(tbody, players) {
@@ -689,7 +776,7 @@
   }
 
   function generateSchedule() {
-    const tbody = document.querySelector('#matchesTable tbody');
+    const tbody = $('adminMatchesBody');
     tbody.innerHTML = '';
     const players = state.players.map(p => p.name).filter(Boolean);
     if (players.length < 2) {
@@ -701,9 +788,9 @@
     } else if (state.format === 'knockout') {
       generateKnockoutSchedule(tbody, players);
     } else {
-      // مجموعات ثم كأس: استخدام جدول دوري بسيط حالياً
       generateLeagueSchedule(tbody, players);
     }
+    syncViewerMatches();
   }
 
   function parseResult(resultStr) {
@@ -717,7 +804,7 @@
     state.players.forEach(p => {
       stats[p.name] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
     });
-    const rows = document.querySelectorAll('#matchesTable tbody tr');
+    const rows = $('adminMatchesBody').querySelectorAll('tr');
     rows.forEach(row => {
       const cells = row.querySelectorAll('td');
       if (cells.length < 4) return;
@@ -807,6 +894,7 @@
     };
 
     function showPage(key) {
+      if (key === 'admin' && !isAdmin) return;
       Object.keys(pageSections).forEach(k => {
         pageSections[k].classList.toggle('active', k === key);
       });
@@ -816,6 +904,7 @@
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const page = btn.getAttribute('data-page');
+        if (page === 'admin' && !isAdmin) return;
         navButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         showPage(page);
@@ -824,6 +913,37 @@
 
     $('generateSchedule').onclick = generateSchedule;
     $('recalculateStandings').onclick = recalculateStandings;
+
+    $('adminToggle').onclick = () => {
+      if (isAdmin) {
+        alert('أنت مسجل كمدير حالياً. يمكنك استخدام صفحة الإدارة أو تسجيل الخروج منها.');
+        return;
+      }
+      const input = prompt('أدخل كلمة مرور المدير:');
+      if (input === null) return;
+      if (input === ADMIN_PASSWORD) {
+        isAdmin = true;
+        localStorage.setItem(ADMIN_STATE_KEY, 'true');
+        renderMode();
+        // تفعيل تبويب الإدارة والانتقال إليه
+        const adminBtn = $('adminTab');
+        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+        adminBtn.classList.add('active');
+        showPage('admin');
+      } else {
+        alert('كلمة المرور غير صحيحة.');
+      }
+    };
+
+    $('adminLogout').onclick = () => {
+      isAdmin = false;
+      localStorage.removeItem(ADMIN_STATE_KEY);
+      renderMode();
+      // العودة لواجهة الدوري
+      document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-page="league"]').classList.add('active');
+      showPage('league');
+    };
   }
 
   document.addEventListener('DOMContentLoaded', init);
