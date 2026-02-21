@@ -18,6 +18,7 @@
     <script type="text/babel">
       const { useState, useEffect } = React;
       const ADMIN_PASSWORD = 'Qq112233';
+      const STORAGE_KEY = 'ea_fc_26_full_state_v1';
 
       function App() {
         const [isAdmin, setIsAdmin] = useState(false);
@@ -25,6 +26,9 @@
         const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
         const [passwordInput, setPasswordInput] = useState('');
         const [passwordError, setPasswordError] = useState('');
+        const [matchFilter, setMatchFilter] = useState('all'); // all | played | upcoming
+        const [saveMessage, setSaveMessage] = useState('');
+        const [selectedPlayerId, setSelectedPlayerId] = useState(null);
 
         const [tournamentInfo, setTournamentInfo] = useState({
           name: 'دوري EA FC الرمضاني',
@@ -44,6 +48,31 @@
         const [matches, setMatches] = useState([]);
         const [standings, setStandings] = useState([]);
         const [newPlayer, setNewPlayer] = useState({ name: '', note: '' });
+
+        // --- Persistence ---
+        useEffect(() => {
+          try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (parsed.tournamentInfo) setTournamentInfo(parsed.tournamentInfo);
+              if (parsed.players) setPlayers(parsed.players);
+              if (parsed.matches) setMatches(parsed.matches);
+              if (parsed.standings) setStandings(parsed.standings);
+            }
+          } catch (e) {
+            console.warn('Failed to load saved state', e);
+          }
+        }, []);
+
+        useEffect(() => {
+          const data = { tournamentInfo, players, matches, standings };
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          } catch (e) {
+            console.warn('Failed to save state', e);
+          }
+        }, [tournamentInfo, players, matches, standings]);
 
         // --- Logic Functions ---
         const generateSchedule = () => {
@@ -155,7 +184,6 @@
         const handleRemovePlayer = (id) => {
           const updatedPlayers = players.filter((p) => p.id !== id);
           setPlayers(updatedPlayers);
-          // يمكن لاحقاً إضافة منطق لمسح مباريات هذا اللاعب
         };
 
         const handleMatchScoreChange = (id, field, value) => {
@@ -172,10 +200,32 @@
           setMatches(updatedMatches);
         };
 
-        // --- Viewer UI ---
+        const handleResetTournament = () => {
+          if (
+            confirm(
+              'سيتم مسح جدول المباريات والترتيب الحالي والاحتفاظ باللاعبين والقوانين. هل تريد المتابعة؟'
+            )
+          ) {
+            setMatches([]);
+            setStandings([]);
+            setMatchFilter('all');
+            setSelectedPlayerId(null);
+          }
+        };
+
+        const filteredMatches = matches.filter((m) => {
+          if (matchFilter === 'played') return m.isPlayed;
+          if (matchFilter === 'upcoming') return !m.isPlayed;
+          return true;
+        });
+
+        const playedCount = matches.filter((m) => m.isPlayed).length;
+
+        const formatFormat = (type) => type;
+
         const ViewMode = () => (
           <div className="space-y-6">
-            {/* الترتيب */}
+            {/* Standings */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-yellow-500 text-lg">🏆</span>
@@ -200,7 +250,12 @@
                     {standings.map((team, index) => (
                       <tr
                         key={team.id}
-                        className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors"
+                        className={`border-b border-slate-800 hover:bg-slate-800/20 transition-colors cursor-pointer ${
+                          selectedPlayerId === team.id
+                            ? 'bg-slate-800/40'
+                            : ''
+                        }`}
+                        onClick={() => setSelectedPlayerId(team.id)}
                       >
                         <td className="px-4 py-3 font-bold text-slate-500">{index + 1}</td>
                         <td className="px-4 py-3 font-medium text-white">{team.name}</td>
@@ -222,24 +277,73 @@
                   </tbody>
                 </table>
               </div>
+              {selectedPlayerId && (
+                <div className="border-t border-slate-800 p-4 text-sm text-slate-300 bg-slate-950/40">
+                  {(() => {
+                    const p = standings.find((s) => s.id === selectedPlayerId);
+                    if (!p) return null;
+                    return (
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div>
+                          <div className="text-white font-bold">{p.name}</div>
+                          <div className="text-xs text-slate-400">
+                            مباريات: {p.played} | فوز: {p.won} | تعادل: {p.drawn} | خسارة: {p.lost}
+                          </div>
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          أهداف: {p.gf} له / {p.ga} عليه | فارق: {p.gf - p.ga} | نقاط: {p.points}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
             </div>
 
-            {/* جدول المباريات */}
+            {/* Matches */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
-              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
-                <span className="text-blue-400 text-lg">📅</span>
-                <h2 className="text-lg font-bold text-white">جدول المباريات</h2>
+              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-blue-400 text-lg">📅</span>
+                  <h2 className="text-lg font-bold text-white">جدول المباريات</h2>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <span>المباريات الملعوبة: {playedCount} / {matches.length}</span>
+                  <div className="flex bg-slate-900 rounded-full border border-slate-700 overflow-hidden">
+                    {['all', 'played', 'upcoming'].map((f) => (
+                      <button
+                        key={f}
+                        className={`px-3 py-1 ${
+                          matchFilter === f
+                            ? 'bg-slate-700 text-yellow-400'
+                            : 'text-slate-400'
+                        }`}
+                        onClick={() => setMatchFilter(f)}
+                      >
+                        {f === 'all'
+                          ? 'الكل'
+                          : f === 'played'
+                          ? 'الملعوبة'
+                          : 'القادمة'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div className="p-4 space-y-3">
-                {matches.length === 0 ? (
+                {filteredMatches.length === 0 ? (
                   <p className="text-center text-slate-500 py-4">
-                    لم يتم إصدار جدول المباريات بعد.
+                    لا توجد مباريات في هذا الفلتر.
                   </p>
                 ) : (
-                  matches.map((match) => (
+                  filteredMatches.map((match) => (
                     <div
                       key={match.id}
-                      className="flex flex-col md:flex-row items-center justify-between bg-slate-800/30 rounded-xl p-3 border border-slate-800/50"
+                      className={`flex flex-col md:flex-row items-center justify-between rounded-xl p-3 border ${
+                        match.isPlayed
+                          ? 'bg-slate-900 border-green-900/50'
+                          : 'bg-slate-900 border-slate-800'
+                      }`}
                     >
                       <div className="text-xs text-slate-400 mb-2 md:mb-0 w-full md:w-auto text-center md:text-right">
                         <span>{match.date}</span> - <span>{match.time}</span>
@@ -267,7 +371,7 @@
               </div>
             </div>
 
-            {/* القوانين */}
+            {/* Rules */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-purple-400 text-lg">⚠️</span>
@@ -288,10 +392,9 @@
           </div>
         );
 
-        // --- Admin UI ---
         const AdminMode = () => (
           <div className="space-y-6">
-            {/* إعدادات البطولة */}
+            {/* Settings */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-slate-400 text-lg">⚙️</span>
@@ -337,7 +440,7 @@
               </div>
             </div>
 
-            {/* إدارة اللاعبين */}
+            {/* Players */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -346,7 +449,6 @@
                 </div>
               </div>
               <div className="p-5">
-                {/* نموذج إضافة لاعب */}
                 <div className="flex flex-col md:flex-row gap-3 mb-6 bg-slate-950 p-4 rounded-xl border border-slate-800">
                   <div className="flex-1">
                     <input
@@ -354,9 +456,7 @@
                       placeholder="اسم اللاعب / الكنية (مثال: أبو فلان)"
                       className="w-full bg-transparent border-b border-slate-700 px-2 py-2 text-white focus:outline-none focus:border-yellow-500"
                       value={newPlayer.name}
-                      onChange={(e) =>
-                        setNewPlayer({ ...newPlayer, name: e.target.value })
-                      }
+                      onChange={(e) => setNewPlayer({ ...newPlayer, name: e.target.value })}
                     />
                   </div>
                   <div className="flex-1">
@@ -365,9 +465,7 @@
                       placeholder="ملاحظة (مثال: الفريق المفضل)"
                       className="w-full bg-transparent border-b border-slate-700 px-2 py-2 text-white text-sm focus:outline-none focus:border-yellow-500"
                       value={newPlayer.note}
-                      onChange={(e) =>
-                        setNewPlayer({ ...newPlayer, note: e.target.value })
-                      }
+                      onChange={(e) => setNewPlayer({ ...newPlayer, note: e.target.value })}
                     />
                   </div>
                   <button
@@ -379,7 +477,6 @@
                   </button>
                 </div>
 
-                {/* قائمة اللاعبين */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {players.map((player) => (
                     <div
@@ -387,13 +484,9 @@
                       className="bg-slate-800/50 border border-slate-700 rounded-lg p-3 flex justify-between items-center"
                     >
                       <div>
-                        <div className="text-white font-medium">
-                          {player.name}
-                        </div>
+                        <div className="text-white font-medium">{player.name}</div>
                         {player.note && (
-                          <div className="text-xs text-slate-400 mt-0.5">
-                            {player.note}
-                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5">{player.note}</div>
                         )}
                       </div>
                       <button
@@ -414,7 +507,7 @@
               </div>
             </div>
 
-            {/* إدارة القوانين */}
+            {/* Rules */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-purple-400 text-lg">⚠️</span>
@@ -432,7 +525,7 @@
               </div>
             </div>
 
-            {/* إدارة المباريات */}
+            {/* Matches */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -497,11 +590,7 @@
                                 className="w-12 h-10 bg-slate-800 border border-slate-600 rounded-md text-center text-white font-bold focus:outline-none focus:border-yellow-500 focus:bg-slate-700"
                                 value={match.score1}
                                 onChange={(e) =>
-                                  handleMatchScoreChange(
-                                    match.id,
-                                    'score1',
-                                    e.target.value
-                                  )
+                                  handleMatchScoreChange(match.id, 'score1', e.target.value)
                                 }
                               />
                               <span className="text-slate-500">-</span>
@@ -511,11 +600,7 @@
                                 className="w-12 h-10 bg-slate-800 border border-slate-600 rounded-md text-center text-white font-bold focus:outline-none focus:border-yellow-500 focus:bg-slate-700"
                                 value={match.score2}
                                 onChange={(e) =>
-                                  handleMatchScoreChange(
-                                    match.id,
-                                    'score2',
-                                    e.target.value
-                                  )
+                                  handleMatchScoreChange(match.id, 'score2', e.target.value)
                                 }
                               />
                             </div>
@@ -531,20 +616,25 @@
               </div>
             </div>
 
-            {/* أدوات المنظم */}
+            {/* Admin Tools */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg p-5">
-              <h3 className="text-sm font-bold text-slate-400 mb-4">
-                أدوات المنظم
-              </h3>
-              <div className="flex flex-wrap gap-3">
+              <h3 className="text-sm font-bold text-slate-400 mb-4">أدوات المنظم</h3>
+              <div className="flex flex-wrap gap-3 mb-3">
                 <button
                   onClick={() => {
                     calculateStandings(matches, players);
-                    alert('تم تحديث الترتيب بنجاح!');
+                    setSaveMessage('تم حفظ الإعدادات وتحديث الترتيب');
+                    setTimeout(() => setSaveMessage(''), 2500);
                   }}
                   className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2 flex-1 justify-center min-w-[200px]"
                 >
                   💾 حفظ الإعدادات وتحديث الترتيب
+                </button>
+                <button
+                  onClick={handleResetTournament}
+                  className="bg-slate-800 hover:bg-slate-700 text-red-400 border border-red-500/40 font-medium px-6 py-3 rounded-xl transition-colors flex items-center gap-2 justify-center"
+                >
+                  🧹 بدء نسخة جديدة (مسح النتائج)
                 </button>
                 <button
                   onClick={() => {
@@ -556,6 +646,12 @@
                   🔒 تسجيل خروج
                 </button>
               </div>
+              {saveMessage && (
+                <div className="text-xs text-green-400 bg-green-500/10 border border-green-500/20 px-3 py-2 rounded-lg inline-flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                  {saveMessage}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -580,7 +676,6 @@
 
         return (
           <div className="min-h-screen bg-slate-950 text-slate-200 font-sans pb-20" dir="rtl">
-            {/* Header */}
             <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-md">
               <div className="max-w-4xl mx-auto px-4 py-4">
                 <div className="flex items-center justify-between mb-4">
@@ -612,7 +707,6 @@
                     </div>
                   )}
                 </div>
-                {/* Tabs */}
                 <div className="flex bg-slate-950 rounded-xl p-1 border border-slate-800">
                   <button
                     onClick={() => setActiveTab('viewer')}
@@ -640,12 +734,10 @@
               </div>
             </header>
 
-            {/* Main */}
             <main className="max-w-4xl mx-auto px-4 py-6">
               {activeTab === 'viewer' ? <ViewMode /> : <AdminMode />}
             </main>
 
-            {/* Password Modal */}
             {showPasswordPrompt && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20">
                 <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4">
