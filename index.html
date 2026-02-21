@@ -2,303 +2,682 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>دوري EA FC 26 الرمضاني</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      background: #020617;
-      color: #f9fafb;
-      margin: 0;
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --bg-soft: #030712;
+      --border-subtle: #1f2937;
+      --accent: #eab308;
+      --accent-soft: rgba(234, 179, 8, 0.12);
+      --accent-strong: #facc15;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-soft: #6b7280;
+      --danger: #b91c1c;
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.65);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
     }
-    header {
-      text-align: center;
-      padding: 30px 15px;
-      background: linear-gradient(135deg, #020617, #111827);
-      border-bottom: 1px solid #1f2937;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    header h1 {
-      margin: 0 0 5px;
-      color: #eab308;
-      font-size: 24px;
-    }
-    header p {
-      margin: 0;
-      color: #9ca3af;
-      font-size: 14px;
-    }
-    main {
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
-      gap: 20px;
-      padding: 20px;
-    }
-    @media (max-width: 900px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-    }
-    section {
-      background: #020617;
-      border: 1px solid #1f2937;
-      border-radius: 10px;
-      padding: 15px;
-    }
-    h2 {
-      margin-top: 0;
-      font-size: 18px;
-      border-right: 4px solid #eab308;
-      padding-right: 8px;
-    }
-    label {
-      display: block;
-      font-size: 13px;
-      margin-top: 8px;
-      margin-bottom: 3px;
-      color: #e5e7eb;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #374151;
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 13px;
+
+    * {
       box-sizing: border-box;
     }
-    textarea {
-      min-height: 60px;
-      resize: vertical;
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+      margin: 0;
+      min-height: 100vh;
     }
-    button {
-      background: #eab308;
-      color: #111827;
-      border: none;
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 13px;
-      cursor: pointer;
-      margin-top: 8px;
+
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.94));
+      border-bottom: 1px solid rgba(55,65,81,0.8);
+      box-shadow: 0 18px 45px rgba(15,23,42,0.9);
     }
-    button.secondary {
-      background: #111827;
-      color: #e5e7eb;
-      border: 1px solid #374151;
+
+    .hero-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 16px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
     }
-    button.danger {
-      background: #b91c1c;
-      color: #f9fafb;
+
+    .hero-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
     }
-    .small {
+
+    .hero-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at 30% 0, #facc15 0, #b45309 32%, #111827 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 26px rgba(15,23,42,0.9);
+      font-size: 18px;
+    }
+
+    .hero-text h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+      color: var(--accent-strong);
+    }
+
+    .hero-text p {
+      margin: 2px 0 0;
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .pill {
+
+    .hero-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 8px;
-      background: #020617;
+      padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid #1f2937;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at 0 0, rgba(148,163,184,0.18), rgba(15,23,42,0.9));
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .chip-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
+    }
+
+    .chip-accent {
+      border-color: rgba(234,179,8,0.55);
+      background: radial-gradient(circle at 0 0, rgba(234,179,8,0.16), rgba(15,23,42,0.96));
+      color: var(--accent-strong);
+    }
+
+    @media (max-width: 640px) {
+      .hero-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding-bottom: 12px;
+      }
+      .hero-text h1 {
+        font-size: 16px;
+      }
+      .hero-text p {
+        white-space: normal;
+      }
+      .hero-badges {
+        justify-content: flex-start;
+      }
+    }
+
+    /* LAYOUT */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 18px 16px 28px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.85fr);
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.94));
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 14px 14px 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .panel + .panel {
+      margin-top: 14px;
+    }
+
+    .panel-soft {
+      background: radial-gradient(circle at top left, rgba(30,64,175,0.12), rgba(15,23,42,0.96));
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .panel-title-pill {
+      width: 3px;
+      height: 20px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, var(--accent), #f97316);
+    }
+
+    .panel-subtitle {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    h2 {
+      margin: 0;
+    }
+
+    /* FORM ELEMENTS */
+    label {
+      display: block;
+      font-size: 12px;
+      margin-top: 9px;
+      margin-bottom: 3px;
+      color: var(--text-main);
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-bottom: 3px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.92), rgba(15,23,42,0.98));
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(234,179,8,0.9);
+      box-shadow: 0 0 0 1px rgba(234,179,8,0.55);
+      background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,1));
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .field-row > div {
+      flex: 1;
+    }
+
+    @media (max-width: 640px) {
+      .field-row {
+        flex-direction: column;
+      }
+    }
+
+    /* BUTTONS */
+    button {
+      border-radius: var(--radius-pill);
+      border: none;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: radial-gradient(circle at top left, var(--accent), #f97316);
+      color: #111827;
+      box-shadow: 0 10px 25px rgba(15,23,42,0.9);
+      margin-top: 9px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 12px 30px rgba(15,23,42,0.95);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(15,23,42,0.9);
+    }
+
+    .btn-secondary {
+      background: radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.96));
+      color: var(--text-main);
+      border: 1px solid rgba(55,65,81,0.95);
+      box-shadow: 0 10px 22px rgba(15,23,42,0.9);
+    }
+
+    .btn-danger {
+      background: radial-gradient(circle at top left, #ef4444, #b91c1c);
+      color: #fef2f2;
+      border: none;
+      box-shadow: 0 10px 24px rgba(127,29,29,0.85);
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: var(--accent-strong);
+      margin-right: 6px;
+    }
+
+    /* TAGS & LISTS */
+    .player-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at 0 0, rgba(30,64,175,0.25), rgba(15,23,42,0.98));
       font-size: 12px;
       margin: 2px;
+      max-width: 100%;
     }
-    .pill span.name {
+
+    .player-pill-main {
       font-weight: 500;
+      white-space: nowrap;
     }
-    .pill button {
-      padding: 0 6px;
+
+    .player-pill-note {
       font-size: 11px;
-      margin-top: 0;
+      color: var(--text-soft);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
     }
+
+    .player-pill button {
+      margin-top: 0;
+      padding: 2px 8px;
+      font-size: 11px;
+      box-shadow: none;
+    }
+
+    .small-text {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+
+    .list-dot {
+      list-style: none;
+      padding: 0;
+      margin: 4px 0 0;
+    }
+
+    .list-dot li {
+      position: relative;
+      padding-right: 13px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .list-dot li::before {
+      content: "";
+      position: absolute;
+      right: 2px;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    /* TABLES */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 8px;
-      font-size: 13px;
+      font-size: 12px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 12px 25px rgba(15,23,42,0.85);
+      background: rgba(15,23,42,0.98);
     }
+
     th, td {
-      border: 1px solid #1f2937;
+      border: 1px solid rgba(31,41,55,0.9);
       padding: 6px 4px;
       text-align: center;
+      white-space: nowrap;
     }
+
     th {
-      background: #0f172a;
-      color: #e5e7eb;
+      background: radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      color: var(--text-muted);
       font-weight: 500;
-    }
-    .flex-row {
-      display: flex;
-      gap: 8px;
-    }
-    .flex-row > * {
-      flex: 1;
-    }
-    .badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #0f172a;
       font-size: 11px;
-      color: #e5e7eb;
-      margin-right: 4px;
     }
-    .section-header-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
+
+    td {
+      background: linear-gradient(135deg, rgba(15,23,42,0.98), rgba(15,23,42,0.96));
+      font-size: 11px;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.94));
+    }
+
+    td[contenteditable="true"] {
+      cursor: text;
+    }
+
+    td[contenteditable="true"]:focus {
+      outline: 1px solid rgba(234,179,8,0.8);
+      background: rgba(15,23,42,1);
+    }
+
+    .table-caption {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-top: 5px;
+    }
+
+    @media (max-width: 640px) {
+      table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
-  <p>منصة تفاعلية لإدارة دوري الأصدقاء على البلايستيشن في أجواء رمضانية</p>
+  <div class="hero-inner">
+    <div class="hero-main">
+      <div class="hero-logo">⚽</div>
+      <div class="hero-text">
+        <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
+        <p>لوحة تحكم بسيطة لإدارة دوري الأصدقاء على البلايستيشن في أجواء رمضانية</p>
+      </div>
+    </div>
+    <div class="hero-badges">
+      <div class="chip">
+        <span class="chip-dot"></span>
+        مباشر على جهازك – بدون تسجيل دخول
+      </div>
+      <div class="chip chip-accent">
+        يحفظ الإعدادات محلياً في المتصفح
+      </div>
+    </div>
+  </div>
 </header>
 
-<main>
-  <!-- لوحة التحكم / الإعدادات -->
-  <section>
-    <h2>إعدادات الدوري</h2>
+<div class="page">
+  <div class="layout">
+    <!-- الإعدادات -->
+    <div>
+      <div class="panel panel-soft">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>إعدادات الدوري</span>
+          </div>
+          <span class="panel-subtitle">اضبط الأساسيات مرة واحدة ثم عدّل متى شئت</span>
+        </div>
 
-    <label>اسم الدوري</label>
-    <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
+        <label>اسم الدوري</label>
+        <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
+        <div class="field-hint">يمكنك وضع اسم مخصص مثل: دوري الشباب الرمضاني 1447هـ</div>
 
-    <label>المنصة</label>
-    <select id="platform">
-      <option value="PlayStation" selected>PlayStation (اللعب جنب بعض)</option>
-      <option value="Xbox">Xbox</option>
-      <option value="PC">PC</option>
-      <option value="Mixed">منصات متعددة</option>
-    </select>
-
-    <label>نظام البطولة</label>
-    <select id="format">
-      <option value="groups-knockout">مجموعات ثم إقصائي</option>
-      <option value="knockout">إقصائي مباشر (خروج المغلوب)</option>
-      <option value="league">دوري نقاط (الجميع يلعب ضد الجميع)</option>
-      <option value="friendly">مباريات ودية حرة</option>
-    </select>
-
-    <label>مدة الدوري (وصف حر)</label>
-    <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان، أو 10 أيام">
-
-    <h2>إعدادات المباراة</h2>
-    <div class="flex-row">
-      <div>
-        <label>مدة الشوط (بالدقائق)</label>
-        <input id="halfLength" type="number" min="3" max="10" value="5">
-      </div>
-      <div>
-        <label>مستوى الصعوبة</label>
-        <select id="difficulty">
-          <option value="محترف">محترف</option>
-          <option value="عالمي">عالمي</option>
-          <option value="أسطوري">أسطوري</option>
+        <label>المنصة</label>
+        <select id="platform">
+          <option value="PlayStation" selected>PlayStation (اللعب جنب بعض)</option>
+          <option value="Xbox">Xbox</option>
+          <option value="PC">PC</option>
+          <option value="Mixed">منصات متعددة</option>
         </select>
+
+        <label>نظام البطولة</label>
+        <select id="format">
+          <option value="groups-knockout">مجموعات ثم إقصائي</option>
+          <option value="knockout">إقصائي مباشر (خروج المغلوب)</option>
+          <option value="league">دوري نقاط (الجميع ضد الجميع)</option>
+          <option value="friendly">مباريات ودية حرة</option>
+        </select>
+
+        <label>مدة الدوري (وصف حر)</label>
+        <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان، أو من 10 إلى 20 رمضان">
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>إعدادات المباراة</span>
+          </div>
+          <span class="panel-subtitle">تطبَّق على جميع المباريات إلا إذا اتفقتم على غير ذلك</span>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label>مدة الشوط (بالدقائق)</label>
+            <input id="halfLength" type="number" min="3" max="10" value="5">
+          </div>
+          <div>
+            <label>مستوى الصعوبة</label>
+            <select id="difficulty">
+              <option value="محترف">محترف</option>
+              <option value="عالمي">عالمي</option>
+              <option value="أسطوري">أسطوري</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label>مساعدة التحكيم</label>
+            <select id="refAssist">
+              <option value="مساعدة كاملة">مساعدة كاملة</option>
+              <option value="جزئية">جزئية</option>
+              <option value="بدون مساعدة">بدون مساعدة</option>
+            </select>
+          </div>
+          <div>
+            <label>اختيار الفرق</label>
+            <select id="teamSelection">
+              <option value="حر">حرية اختيار أي فريق</option>
+              <option value="دوريات محددة">فرق من دوريات محددة فقط</option>
+              <option value="منتخبات">منتخبات فقط</option>
+              <option value="مستويات متقاربة">فرق من نفس المستوى</option>
+            </select>
+          </div>
+        </div>
+
+        <label>قوانين خاصة (سطر لكل قاعدة)</label>
+        <textarea id="specialRules" placeholder="مثال: لا يمكن تكرار نفس الفريق في نفس الجولة&#10;مثال: في الإقصائي، التعادل يعني أشواط إضافية ثم بلنتيات"></textarea>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button id="saveSettings">
+              <span>حفظ الإعدادات</span>
+            </button>
+            <span class="status-text" id="saveStatus"></span>
+          </div>
+          <div class="small-text">يتم حفظ الإعدادات محلياً في هذا المتصفح فقط</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>إدارة اللاعبين</span>
+          </div>
+          <span class="panel-subtitle">أضف أو احذف اللاعبين، وسيتم تحديث الأقسام الأخرى تلقائياً</span>
+        </div>
+
+        <label>اسم اللاعب / الكنية</label>
+        <input id="playerName" type="text" placeholder="مثال: أبو فلان، أو PSN ID">
+
+        <label>ملاحظات (اختياري: الفريق المفضل، المنصة...)</label>
+        <input id="playerNote" type="text" placeholder="مثال: PSG - PS5">
+
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <button id="addPlayer">
+            <span>إضافة لاعب</span>
+          </button>
+          <div class="small-text">يمكنك تعديل القائمة في أي وقت، حتى أثناء سير الدوري</div>
+        </div>
+
+        <div id="playersList" style="margin-top:10px;"></div>
       </div>
     </div>
 
-    <label>مساعدة التحكيم</label>
-    <select id="refAssist">
-      <option value="مساعدة كاملة">مساعدة كاملة</option>
-      <option value="جزئية">جزئية</option>
-      <option value="بدون مساعدة">بدون مساعدة</option>
-    </select>
+    <!-- العرض والتفاعلات -->
+    <div>
+      <div class="panel panel-soft">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>نظرة عامة على الدوري</span>
+          </div>
+          <span class="chip" id="formatBadge"></span>
+        </div>
+        <div class="small-text" id="summaryText"></div>
+      </div>
 
-    <label>اختيار الفرق</label>
-    <select id="teamSelection">
-      <option value="حر">حرية اختيار أي فريق</option>
-      <option value="دوريات محددة">فرق من دوريات محددة فقط</option>
-      <option value="منتخبات">منتخبات فقط</option>
-      <option value="مستويات متقاربة">فرق من نفس المستوى</option>
-    </select>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>المشاركون</span>
+          </div>
+          <span class="panel-subtitle">قائمة اللاعبين الحاليين في الدوري</span>
+        </div>
+        <div id="playersDisplay" class="small-text"></div>
+      </div>
 
-    <label>قوانين خاصة (سطر لكل قاعدة)</label>
-    <textarea id="specialRules" placeholder="مثال: لا يمكن تكرار اختيار نفس الفريق في نفس الجولة&#10;مثال: في حال التعادل في الإقصائي يتم لعب شوط ذهبي"></textarea>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>جدول المباريات</span>
+          </div>
+          <span class="panel-subtitle">املأ النتائج مباشرة بعد نهاية كل مباراة</span>
+        </div>
+        <table id="matchesTable">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>الوقت</th>
+              <th>المباراة</th>
+              <th>النتيجة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td contenteditable="true">-</td>
+              <td contenteditable="true">-</td>
+              <td contenteditable="true">لاعب 1 vs لاعب 2</td>
+              <td contenteditable="true">-</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-caption">الصفوف قابلة للتعديل مباشرة، ويمكنك إضافة صفوف جديدة بالنسخ واللصق.</div>
+      </div>
 
-    <button id="saveSettings">حفظ الإعدادات</button>
-    <span class="small" id="saveStatus"></span>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>ترتيب الدوري (Standings)</span>
+          </div>
+          <span class="panel-subtitle">يتم إنشاء صف لكل لاعب تلقائياً – عدّل الأرقام يدوياً</span>
+        </div>
+        <table id="standingsTable">
+          <thead>
+            <tr>
+              <th>اللاعب</th>
+              <th>لعب</th>
+              <th>فاز</th>
+              <th>تعادل</th>
+              <th>خسر</th>
+              <th>له</th>
+              <th>عليه</th>
+              <th>النقاط</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody"></tbody>
+        </table>
+        <div class="table-caption">نظام نقاط شائع: الفوز = 3، التعادل = 1، الخسارة = 0.</div>
+      </div>
 
-    <hr style="margin: 15px 0; border-color:#1f2937;">
-
-    <h2>إدارة اللاعبين</h2>
-    <label>اسم اللاعب / الكنية</label>
-    <input id="playerName" type="text" placeholder="مثال: أبو فلان، أو PSN ID">
-
-    <label>ملاحظات (اختياري: الفريق المفضل، المنصة...)</label>
-    <input id="playerNote" type="text" placeholder="مثال: PSG - PS5">
-
-    <button id="addPlayer">إضافة لاعب</button>
-    <div class="small">يمكنك إضافة وحذف اللاعبين في أي وقت، والجدول يتكيف مع العدد.</div>
-
-    <div id="playersList" style="margin-top:8px;"></div>
-  </section>
-
-  <!-- عرض الدوري -->
-  <section>
-    <div class="section-header-line">
-      <h2>نظرة عامة على الدوري</h2>
-      <span class="badge" id="formatBadge"></span>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="panel-title-pill"></span>
+            <span>قوانين الدوري</span>
+          </div>
+          <span class="panel-subtitle">ملخّص كل الإعدادات والقواعد الخاصة</span>
+        </div>
+        <ul class="list-dot" id="rulesDisplay"></ul>
+      </div>
     </div>
-
-    <p class="small" id="summaryText"></p>
-
-    <h2>المشاركون</h2>
-    <div id="playersDisplay" class="small"></div>
-
-    <h2>جدول المباريات (تعبئة يدوية حالياً)</h2>
-    <p class="small">يمكنك كتابة النتائج يدوياً بعد كل مباراة. لاحقاً أستطيع توليد جدول تلقائي حسب النظام المختار.</p>
-    <table id="matchesTable">
-      <thead>
-        <tr>
-          <th>التاريخ</th>
-          <th>الوقت</th>
-          <th>المباراة</th>
-          <th>النتيجة</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td contenteditable="true">-</td>
-          <td contenteditable="true">-</td>
-          <td contenteditable="true">لاعب 1 vs لاعب 2</td>
-          <td contenteditable="true">-</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="small">الصفوف قابلة للتعديل مباشرة، ويمكنك إضافة صفوف جديدة بالنسخ واللصق.</div>
-
-    <h2>ترتيب الدوري (Standings)</h2>
-    <table id="standingsTable">
-      <thead>
-        <tr>
-          <th>اللاعب</th>
-          <th>لعب</th>
-          <th>فاز</th>
-          <th>تعادل</th>
-          <th>خسر</th>
-          <th>له</th>
-          <th>عليه</th>
-          <th>النقاط</th>
-        </tr>
-      </thead>
-      <tbody id="standingsBody">
-        <!-- يتم توليد صف لكل لاعب تلقائياً -->
-      </tbody>
-    </table>
-    <div class="small">يمكنك تعديل الأرقام يدوياً بعد كل مباراة.</div>
-
-    <h2>قوانين الدوري</h2>
-    <ul class="small" id="rulesDisplay"></ul>
-  </section>
-</main>
+  </div>
+</div>
 
 <script>
   const STORAGE_KEY = 'ea_fc_26_tournament';
@@ -335,6 +714,21 @@
     return document.getElementById(id);
   }
 
+  function formatTextKey(format) {
+    switch (format) {
+      case 'groups-knockout':
+        return 'مجموعات ثم إقصائي';
+      case 'knockout':
+        return 'نظام إقصائي مباشر';
+      case 'league':
+        return 'دوري نقاط (الجميع ضد الجميع)';
+      case 'friendly':
+        return 'مباريات ودية حرة';
+      default:
+        return 'غير محدد';
+    }
+  }
+
   function render() {
     $('title-display').textContent = state.tournamentName || 'دوري EA FC 26 الرمضاني';
 
@@ -352,13 +746,13 @@
     playersList.innerHTML = '';
     state.players.forEach((p, index) => {
       const div = document.createElement('div');
-      div.className = 'pill';
+      div.className = 'player-pill';
       div.innerHTML = `
-        <span class="name">${p.name}</span>
-        <span class="small">${p.note || ''}</span>
+        <span class="player-pill-main">${p.name}</span>
+        <span class="player-pill-note">${p.note || ''}</span>
       `;
       const btn = document.createElement('button');
-      btn.className = 'danger';
+      btn.className = 'btn-danger';
       btn.textContent = 'حذف';
       btn.onclick = () => {
         state.players.splice(index, 1);
@@ -371,7 +765,7 @@
 
     const playersDisplay = $('playersDisplay');
     if (state.players.length === 0) {
-      playersDisplay.textContent = 'لم تتم إضافة لاعبين بعد.';
+      playersDisplay.textContent = 'لم تتم إضافة لاعبين بعد. ابدأ بإضافة الأسماء من قسم إدارة اللاعبين.';
     } else {
       playersDisplay.innerHTML = state.players
         .map(p => `• ${p.name} ${p.note ? '— ' + p.note : ''}`)
@@ -379,21 +773,7 @@
     }
 
     const formatBadge = $('formatBadge');
-    let formatText = '';
-    switch (state.format) {
-      case 'groups-knockout':
-        formatText = 'مجموعات ثم إقصائي';
-        break;
-      case 'knockout':
-        formatText = 'نظام إقصائي مباشر';
-        break;
-      case 'league':
-        formatText = 'دوري نقاط (الجميع ضد الجميع)';
-        break;
-      case 'friendly':
-        formatText = 'مباريات ودية حرة';
-        break;
-    }
+    const formatText = formatTextKey(state.format);
     formatBadge.textContent = formatText;
 
     const summaryParts = [];
@@ -403,7 +783,7 @@
     summaryParts.push(`المستوى: ${state.difficulty}`);
     if (state.duration) summaryParts.push(`المدة: ${state.duration}`);
     summaryParts.push(`عدد اللاعبين الحالي: ${state.players.length}`);
-    $('summaryText').textContent = summaryParts.join(' | ');
+    $('summaryText').textContent = summaryParts.join('  •  ');
 
     const rulesDisplay = $('rulesDisplay');
     rulesDisplay.innerHTML = '';
@@ -459,7 +839,7 @@
       saveState();
       render();
       $('saveStatus').textContent = 'تم الحفظ ✅';
-      setTimeout(() => $('saveStatus').textContent = '', 2000);
+      setTimeout(() => $('saveStatus').textContent = '', 2200);
     };
 
     $('addPlayer').onclick = () => {
