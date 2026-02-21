@@ -30,8 +30,6 @@
       min-height: 100vh;
     }
 
-    a { color: inherit; text-decoration: none; }
-
     header {
       position: sticky;
       top: 0;
@@ -100,27 +98,8 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(55,65,81,0.9);
-      background: radial-gradient(circle at 0 0, rgba(148,163,184,0.18), rgba(15,23,42,0.95));
       font-size: 11px;
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-    .chip-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
+      color: var(--text-soft);
     }
 
     .nav-row {
@@ -411,161 +390,62 @@
         <div class="hero-logo">⚽</div>
         <div class="hero-text">
           <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
-          <p>منصة بسيطة لإدارة دوري الأصدقاء على البلايستيشن</p>
+          <p>ترتيب، نتائج، وقوانين دوري الأصدقاء – مع واجهة خاصة للمدير</p>
         </div>
       </div>
       <div class="hero-meta">
-        <div class="chip">
-          <span class="chip-dot"></span>
-          يعمل مباشرة في المتصفح – بدون تسجيل دخول
-        </div>
+        <span>واجهتان: للمشاهدة وللإدارة</span>
       </div>
     </div>
     <nav class="nav-row">
-      <button class="nav-pill active" data-page="home">
-        <span class="icon">🏠</span>
-        <span>الرئيسية</span>
+      <button class="nav-pill active" data-page="league">
+        <span class="icon">🏆</span>
+        <span>الدوري (عرض للمشاهد)</span>
       </button>
-      <button class="nav-pill" data-page="settings">
+      <button class="nav-pill" data-page="admin">
         <span class="icon">⚙️</span>
-        <span>الإعدادات</span>
-      </button>
-      <button class="nav-pill" data-page="matches">
-        <span class="icon">📅</span>
-        <span>جدول المباريات</span>
-      </button>
-      <button class="nav-pill" data-page="standings">
-        <span class="icon">📊</span>
-        <span>الترتيب</span>
+        <span>الإدارة (للمنظّم)</span>
       </button>
     </nav>
   </div>
 </header>
 
 <div class="page">
-  <!-- صفحة: الرئيسية (عن الدوري + نظرة عامة + القوانين الأساسية) -->
-  <div class="page-section active" id="page-home">
+  <!-- واجهة المشاهد: الترتيب + النتائج + القوانين -->
+  <div class="page-section active" id="page-league">
     <div class="panel panel-soft">
       <div class="panel-header">
         <div class="panel-title">
           <span class="panel-title-pill"></span>
-          <span>عن الدوري</span>
+          <span>ترتيب الدوري</span>
         </div>
+        <span class="panel-subtitle">هذه الصفحة مخصصة للمشاهدة من قِبل اللاعبين</span>
       </div>
-      <div class="small-text" id="homeSummary"></div>
-      <ul class="list-dot" id="homeDetails" style="margin-top:8px;"></ul>
+      <table id="standingsTable">
+        <thead>
+          <tr>
+            <th>اللاعب</th>
+            <th>لعب</th>
+            <th>فاز</th>
+            <th>تعادل</th>
+            <th>خسر</th>
+            <th>له</th>
+            <th>عليه</th>
+            <th>النقاط</th>
+          </tr>
+        </thead>
+        <tbody id="standingsBody"></tbody>
+      </table>
+      <div class="small-text">يتم حساب الأرقام من نتائج جدول المباريات بواسطة المنظّم.</div>
     </div>
 
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title">
           <span class="panel-title-pill"></span>
-          <span>القوانين الأساسية</span>
+          <span>جدول المباريات والنتائج</span>
         </div>
       </div>
-      <ul class="list-dot" id="rulesDisplay"></ul>
-    </div>
-  </div>
-
-  <!-- صفحة: الإعدادات -->
-  <div class="page-section" id="page-settings">
-    <div class="panel panel-soft">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>إعدادات الدوري</span>
-        </div>
-        <span class="panel-subtitle">يضبطها المنظّم مرة واحدة، ويمكن تعديلها في أي وقت</span>
-      </div>
-
-      <label>اسم الدوري</label>
-      <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
-      <div class="field-hint">مثال: دوري الأصدقاء الرمضاني 1447هـ</div>
-
-      <label>المنصة</label>
-      <select id="platform">
-        <option value="PlayStation" selected>PlayStation (اللعب جنب بعض)</option>
-        <option value="Xbox">Xbox</option>
-        <option value="PC">PC</option>
-      </select>
-
-      <label>نوع البطولة</label>
-      <select id="format">
-        <option value="league">دوري (الجميع يلعب ضد الجميع)</option>
-        <option value="knockout">كأس – إقصائي مباشر (خروج المغلوب)</option>
-        <option value="groups-knockout">مجموعات ثم كأس (مجموعات ثم إقصائي)</option>
-      </select>
-
-      <div class="field-row">
-        <div>
-          <label>مدة الشوط (بالدقائق)</label>
-          <input id="halfLength" type="number" min="3" max="10" value="5">
-        </div>
-        <div>
-          <label>مستوى الصعوبة</label>
-          <select id="difficulty">
-            <option value="محترف">محترف</option>
-            <option value="عالمي">عالمي</option>
-            <option value="أسطوري">أسطوري</option>
-          </select>
-        </div>
-      </div>
-
-      <label>مدة الدوري (اختياري)</label>
-      <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان أو من 10 إلى 20 رمضان">
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>اللاعبون</span>
-        </div>
-        <span class="panel-subtitle">أضف أو احذف اللاعبين المشاركين في الدوري</span>
-      </div>
-
-      <label>اسم اللاعب / الكنية</label>
-      <input id="playerName" type="text" placeholder="مثال: أبو فلان أو PSN ID">
-
-      <label>ملاحظة (اختياري: الفريق المفضل أو أي تعليق)</label>
-      <input id="playerNote" type="text" placeholder="مثال: PSG - PS5">
-
-      <button id="addPlayer">إضافة لاعب</button>
-      <div class="small-text">يمكن تعديل القائمة في أي وقت.</div>
-
-      <div id="playersList" style="margin-top:10px;"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>قوانين الدوري</span>
-        </div>
-        <span class="panel-subtitle">اكتب القواعد الرئيسية للدوري</span>
-      </div>
-      <label>القوانين (سطر لكل قاعدة)</label>
-      <textarea id="specialRules" placeholder="مثال: لا يمكن تكرار نفس الفريق في نفس الجولة&#10;مثال: في الكأس، التعادل يعني أشواط إضافية ثم بلنتيات"></textarea>
-    </div>
-
-    <div class="panel">
-      <button id="saveSettings">حفظ الإعدادات</button>
-      <span class="status-text" id="saveStatus"></span>
-      <div class="small-text">يتم حفظ الإعدادات محلياً في هذا المتصفح فقط.</div>
-    </div>
-  </div>
-
-  <!-- صفحة: جدول المباريات -->
-  <div class="page-section" id="page-matches">
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">
-          <span class="panel-title-pill"></span>
-          <span>جدول المباريات</span>
-        </div>
-        <span class="panel-subtitle">يمكن توليد الجدول حسب نوع البطولة أو تعبئته يدوياً</span>
-      </div>
-      <button id="generateSchedule" class="btn-secondary">توليد جدول المباريات حسب نوع البطولة</button>
       <table id="matchesTable">
         <thead>
           <tr>
@@ -584,37 +464,93 @@
           </tr>
         </tbody>
       </table>
-      <div class="table-caption">اكتب النتيجة بصيغة 1-3 أو 0-0 ليتم احتسابها في الترتيب.</div>
+      <div class="table-caption">المنظّم يملأ النتائج بصيغة 1-3 أو 0-0 ليتم احتسابها في الترتيب.</div>
     </div>
-  </div>
 
-  <!-- صفحة: الترتيب -->
-  <div class="page-section" id="page-standings">
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title">
           <span class="panel-title-pill"></span>
-          <span>ترتيب الدوري</span>
+          <span>قوانين الدوري</span>
         </div>
-        <span class="panel-subtitle">يُحسب تلقائياً من جدول المباريات</span>
       </div>
-      <button id="recalculateStandings">تحديث الترتيب من النتائج</button>
-      <div class="small-text">الفوز = 3 نقاط، التعادل = 1، الخسارة = 0.</div>
-      <table id="standingsTable">
-        <thead>
-          <tr>
-            <th>اللاعب</th>
-            <th>لعب</th>
-            <th>فاز</th>
-            <th>تعادل</th>
-            <th>خسر</th>
-            <th>له</th>
-            <th>عليه</th>
-            <th>النقاط</th>
-          </tr>
-        </thead>
-        <tbody id="standingsBody"></tbody>
-      </table>
+      <ul class="list-dot" id="rulesDisplay"></ul>
+    </div>
+  </div>
+
+  <!-- واجهة المدير: إعدادات + لاعبين + قوانين + أزرار التوليد/التحديث -->
+  <div class="page-section" id="page-admin">
+    <div class="panel panel-soft">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
+          <span>إعدادات البطولة</span>
+        </div>
+        <span class="panel-subtitle">هذه الصفحة خاصة بالمنظّم فقط</span>
+      </div>
+
+      <label>اسم الدوري</label>
+      <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
+      <div class="field-hint">مثال: دوري الأصدقاء الرمضاني 1447هـ</div>
+
+      <label>نوع البطولة</label>
+      <select id="format">
+        <option value="league">دوري (الجميع يلعب ضد الجميع)</option>
+        <option value="knockout">كأس – إقصائي مباشر</option>
+        <option value="groups-knockout">مجموعات ثم كأس</option>
+      </select>
+
+      <label>مدة الدوري (اختياري)</label>
+      <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان أو من 10 إلى 20 رمضان">
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
+          <span>اللاعبون</span>
+        </div>
+        <span class="panel-subtitle">إضافة أو حذف اللاعبين المشاركين في الدوري</span>
+      </div>
+
+      <label>اسم اللاعب / الكنية</label>
+      <input id="playerName" type="text" placeholder="مثال: أبو فلان أو PSN ID">
+
+      <label>ملاحظة (اختياري)</label>
+      <input id="playerNote" type="text" placeholder="مثال: الفريق المفضل أو أي تعليق بسيط">
+
+      <button id="addPlayer">إضافة لاعب</button>
+      <div class="small-text">يمكن تعديل القائمة في أي وقت.</div>
+
+      <div id="playersList" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
+          <span>قوانين الدوري</span>
+        </div>
+        <span class="panel-subtitle">اكتب القواعد الرئيسية، بما فيها مدة الشوط ومستوى الصعوبة</span>
+      </div>
+      <label>القوانين (سطر لكل قاعدة)</label>
+      <textarea id="specialRules" placeholder="مثال: مدة الشوط 6 دقائق&#10;مثال: المستوى محترف&#10;مثال: لا يمكن تكرار نفس الفريق في نفس الجولة"></textarea>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
+          <span>أدوات المنظّم</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button id="saveSettings">حفظ الإعدادات</button>
+        <button id="generateSchedule" class="btn-secondary">توليد جدول المباريات حسب نوع البطولة</button>
+        <button id="recalculateStandings" class="btn-secondary">تحديث الترتيب من النتائج</button>
+      </div>
+      <span class="status-text" id="saveStatus"></span>
+      <div class="small-text">كل الإعدادات واللاعبين محفوظة محلياً في هذا المتصفح.</div>
     </div>
   </div>
 </div>
@@ -624,11 +560,8 @@
 
   const state = {
     tournamentName: 'دوري EA FC 26 الرمضاني',
-    platform: 'PlayStation',
     format: 'league',
     duration: '',
-    halfLength: 5,
-    difficulty: 'محترف',
     specialRules: [],
     players: []
   };
@@ -658,31 +591,43 @@
     }
   }
 
-  function renderHome() {
-    const details = [];
-    details.push(`اسم الدوري: ${state.tournamentName}`);
-    details.push(`المنصة: ${state.platform}`);
-    details.push(`نوع البطولة: ${formatFormat(state.format)}`);
-    if (state.duration) details.push(`مدة الدوري: ${state.duration}`);
-    details.push(`عدد اللاعبين: ${state.players.length}`);
-
-    $('homeSummary').textContent = 'هذه الصفحة لعرض ملخص سريع عن الدوري للاعبين والمنظمين.';
-    const list = $('homeDetails');
-    list.innerHTML = '';
-    details.forEach(d => {
-      const li = document.createElement('li');
-      li.textContent = d;
-      list.appendChild(li);
+  function renderLeagueView() {
+    // Standings skeleton
+    const body = $('standingsBody');
+    body.innerHTML = '';
+    state.players.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p.name}</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+      `;
+      body.appendChild(tr);
     });
+
+    // Rules
+    const rulesDisplay = $('rulesDisplay');
+    rulesDisplay.innerHTML = '';
+    const baseRules = [
+      `نوع البطولة: ${formatFormat(state.format)}`
+    ];
+    baseRules.concat(state.specialRules.filter(r => r.trim().length > 0))
+      .forEach(rule => {
+        const li = document.createElement('li');
+        li.textContent = rule;
+        rulesDisplay.appendChild(li);
+      });
   }
 
-  function renderSettings() {
+  function renderAdminView() {
     $('tournamentName').value = state.tournamentName;
-    $('platform').value = state.platform;
     $('format').value = state.format;
     $('duration').value = state.duration;
-    $('halfLength').value = state.halfLength;
-    $('difficulty').value = state.difficulty;
     $('specialRules').value = state.specialRules.join('\n');
 
     const playersList = $('playersList');
@@ -707,47 +652,10 @@
     });
   }
 
-  function renderRules() {
-    const rulesDisplay = $('rulesDisplay');
-    rulesDisplay.innerHTML = '';
-    const baseRules = [
-      `مدة الشوط: ${state.halfLength} دقائق`,
-      `مستوى الصعوبة: ${state.difficulty}`,
-      `نوع البطولة: ${formatFormat(state.format)}`
-    ];
-    baseRules.concat(state.specialRules.filter(r => r.trim().length > 0))
-      .forEach(rule => {
-        const li = document.createElement('li');
-        li.textContent = rule;
-        rulesDisplay.appendChild(li);
-      });
-  }
-
-  function renderStandingsSkeleton() {
-    const body = $('standingsBody');
-    body.innerHTML = '';
-    state.players.forEach(p => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${p.name}</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-      `;
-      body.appendChild(tr);
-    });
-  }
-
   function renderAll() {
     $('title-display').textContent = state.tournamentName || 'دوري EA FC 26 الرمضاني';
-    renderHome();
-    renderSettings();
-    renderRules();
-    renderStandingsSkeleton();
+    renderLeagueView();
+    renderAdminView();
   }
 
   function generateLeagueSchedule(tbody, players) {
@@ -793,7 +701,7 @@
     } else if (state.format === 'knockout') {
       generateKnockoutSchedule(tbody, players);
     } else {
-      // مجموعات ثم كأس: نستخدم حالياً جدول دوري بسيط كحل وسط
+      // مجموعات ثم كأس: استخدام جدول دوري بسيط حالياً
       generateLeagueSchedule(tbody, players);
     }
   }
@@ -869,11 +777,8 @@
 
     $('saveSettings').onclick = () => {
       state.tournamentName = $('tournamentName').value.trim() || state.tournamentName;
-      state.platform = $('platform').value;
       state.format = $('format').value;
       state.duration = $('duration').value.trim();
-      state.halfLength = parseInt($('halfLength').value, 10) || 5;
-      state.difficulty = $('difficulty').value;
       state.specialRules = $('specialRules').value
         .split('\n')
         .map(r => r.trim())
@@ -897,10 +802,8 @@
 
     const navButtons = document.querySelectorAll('.nav-pill');
     const pageSections = {
-      home: document.getElementById('page-home'),
-      settings: document.getElementById('page-settings'),
-      matches: document.getElementById('page-matches'),
-      standings: document.getElementById('page-standings')
+      league: document.getElementById('page-league'),
+      admin: document.getElementById('page-admin')
     };
 
     function showPage(key) {
