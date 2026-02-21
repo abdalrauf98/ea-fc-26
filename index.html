@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دوري EA FC 26 الرمضاني</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #020617;
+      color: #f9fafb;
+      margin: 0;
+    }
+    header {
+      text-align: center;
+      padding: 30px 15px;
+      background: linear-gradient(135deg, #020617, #111827);
+      border-bottom: 1px solid #1f2937;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0 0 5px;
+      color: #eab308;
+      font-size: 24px;
+    }
+    header p {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr);
+      gap: 20px;
+      padding: 20px;
+    }
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+    section {
+      background: #020617;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 15px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+      border-right: 4px solid #eab308;
+      padding-right: 8px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      margin-top: 8px;
+      margin-bottom: 3px;
+      color: #e5e7eb;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+    button {
+      background: #eab308;
+      color: #111827;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    button.secondary {
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #374151;
+    }
+    button.danger {
+      background: #b91c1c;
+      color: #f9fafb;
+    }
+    .small {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      font-size: 12px;
+      margin: 2px;
+    }
+    .pill span.name {
+      font-weight: 500;
+    }
+    .pill button {
+      padding: 0 6px;
+      font-size: 11px;
+      margin-top: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid #1f2937;
+      padding: 6px 4px;
+      text-align: center;
+    }
+    th {
+      background: #0f172a;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .flex-row {
+      display: flex;
+      gap: 8px;
+    }
+    .flex-row > * {
+      flex: 1;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #0f172a;
+      font-size: 11px;
+      color: #e5e7eb;
+      margin-right: 4px;
+    }
+    .section-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
+  <p>منصة تفاعلية لإدارة دوري الأصدقاء على البلايستيشن في أجواء رمضانية</p>
+</header>
+
+<main>
+  <!-- لوحة التحكم / الإعدادات -->
+  <section>
+    <h2>إعدادات الدوري</h2>
+
+    <label>اسم الدوري</label>
+    <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
+
+    <label>المنصة</label>
+    <select id="platform">
+      <option value="PlayStation" selected>PlayStation (اللعب جنب بعض)</option>
+      <option value="Xbox">Xbox</option>
+      <option value="PC">PC</option>
+      <option value="Mixed">منصات متعددة</option>
+    </select>
+
+    <label>نظام البطولة</label>
+    <select id="format">
+      <option value="groups-knockout">مجموعات ثم إقصائي</option>
+      <option value="knockout">إقصائي مباشر (خروج المغلوب)</option>
+      <option value="league">دوري نقاط (الجميع يلعب ضد الجميع)</option>
+      <option value="friendly">مباريات ودية حرة</option>
+    </select>
+
+    <label>مدة الدوري (وصف حر)</label>
+    <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان، أو 10 أيام">
+
+    <h2>إعدادات المباراة</h2>
+    <div class="flex-row">
+      <div>
+        <label>مدة الشوط (بالدقائق)</label>
+        <input id="halfLength" type="number" min="3" max="10" value="5">
+      </div>
+      <div>
+        <label>مستوى الصعوبة</label>
+        <select id="difficulty">
+          <option value="محترف">محترف</option>
+          <option value="عالمي">عالمي</option>
+          <option value="أسطوري">أسطوري</option>
+        </select>
+      </div>
+    </div>
+
+    <label>مساعدة التحكيم</label>
+    <select id="refAssist">
+      <option value="مساعدة كاملة">مساعدة كاملة</option>
+      <option value="جزئية">جزئية</option>
+      <option value="بدون مساعدة">بدون مساعدة</option>
+    </select>
+
+    <label>اختيار الفرق</label>
+    <select id="teamSelection">
+      <option value="حر">حرية اختيار أي فريق</option>
+      <option value="دوريات محددة">فرق من دوريات محددة فقط</option>
+      <option value="منتخبات">منتخبات فقط</option>
+      <option value="مستويات متقاربة">فرق من نفس المستوى</option>
+    </select>
+
+    <label>قوانين خاصة (سطر لكل قاعدة)</label>
+    <textarea id="specialRules" placeholder="مثال: لا يمكن تكرار اختيار نفس الفريق في نفس الجولة&#10;مثال: في حال التعادل في الإقصائي يتم لعب شوط ذهبي"></textarea>
+
+    <button id="saveSettings">حفظ الإعدادات</button>
+    <span class="small" id="saveStatus"></span>
+
+    <hr style="margin: 15px 0; border-color:#1f2937;">
+
+    <h2>إدارة اللاعبين</h2>
+    <label>اسم اللاعب / الكنية</label>
+    <input id="playerName" type="text" placeholder="مثال: أبو فلان، أو PSN ID">
+
+    <label>ملاحظات (اختياري: الفريق المفضل، المنصة...)</label>
+    <input id="playerNote" type="text" placeholder="مثال: PSG - PS5">
+
+    <button id="addPlayer">إضافة لاعب</button>
+    <div class="small">يمكنك إضافة وحذف اللاعبين في أي وقت، والجدول يتكيف مع العدد.</div>
+
+    <div id="playersList" style="margin-top:8px;"></div>
+  </section>
+
+  <!-- عرض الدوري -->
+  <section>
+    <div class="section-header-line">
+      <h2>نظرة عامة على الدوري</h2>
+      <span class="badge" id="formatBadge"></span>
+    </div>
+
+    <p class="small" id="summaryText"></p>
+
+    <h2>المشاركون</h2>
+    <div id="playersDisplay" class="small"></div>
+
+    <h2>جدول المباريات (تعبئة يدوية حالياً)</h2>
+    <p class="small">يمكنك كتابة النتائج يدوياً بعد كل مباراة. لاحقاً أستطيع توليد جدول تلقائي حسب النظام المختار.</p>
+    <table id="matchesTable">
+      <thead>
+        <tr>
+          <th>التاريخ</th>
+          <th>الوقت</th>
+          <th>المباراة</th>
+          <th>النتيجة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td contenteditable="true">-</td>
+          <td contenteditable="true">-</td>
+          <td contenteditable="true">لاعب 1 vs لاعب 2</td>
+          <td contenteditable="true">-</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="small">الصفوف قابلة للتعديل مباشرة، ويمكنك إضافة صفوف جديدة بالنسخ واللصق.</div>
+
+    <h2>ترتيب الدوري (Standings)</h2>
+    <table id="standingsTable">
+      <thead>
+        <tr>
+          <th>اللاعب</th>
+          <th>لعب</th>
+          <th>فاز</th>
+          <th>تعادل</th>
+          <th>خسر</th>
+          <th>له</th>
+          <th>عليه</th>
+          <th>النقاط</th>
+        </tr>
+      </thead>
+      <tbody id="standingsBody">
+        <!-- يتم توليد صف لكل لاعب تلقائياً -->
+      </tbody>
+    </table>
+    <div class="small">يمكنك تعديل الأرقام يدوياً بعد كل مباراة.</div>
+
+    <h2>قوانين الدوري</h2>
+    <ul class="small" id="rulesDisplay"></ul>
+  </section>
+</main>
+
+<script>
+  const STORAGE_KEY = 'ea_fc_26_tournament';
+
+  const state = {
+    tournamentName: 'دوري EA FC 26 الرمضاني',
+    platform: 'PlayStation',
+    format: 'groups-knockout',
+    duration: '',
+    halfLength: 5,
+    difficulty: 'محترف',
+    refAssist: 'مساعدة كاملة',
+    teamSelection: 'حر',
+    specialRules: [],
+    players: []
+  };
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      Object.assign(state, parsed);
+    } catch (e) {
+      console.warn('Failed to load state', e);
+    }
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function render() {
+    $('title-display').textContent = state.tournamentName || 'دوري EA FC 26 الرمضاني';
+
+    $('tournamentName').value = state.tournamentName;
+    $('platform').value = state.platform;
+    $('format').value = state.format;
+    $('duration').value = state.duration;
+    $('halfLength').value = state.halfLength;
+    $('difficulty').value = state.difficulty;
+    $('refAssist').value = state.refAssist;
+    $('teamSelection').value = state.teamSelection;
+    $('specialRules').value = state.specialRules.join('\n');
+
+    const playersList = $('playersList');
+    playersList.innerHTML = '';
+    state.players.forEach((p, index) => {
+      const div = document.createElement('div');
+      div.className = 'pill';
+      div.innerHTML = `
+        <span class="name">${p.name}</span>
+        <span class="small">${p.note || ''}</span>
+      `;
+      const btn = document.createElement('button');
+      btn.className = 'danger';
+      btn.textContent = 'حذف';
+      btn.onclick = () => {
+        state.players.splice(index, 1);
+        saveState();
+        render();
+      };
+      div.appendChild(btn);
+      playersList.appendChild(div);
+    });
+
+    const playersDisplay = $('playersDisplay');
+    if (state.players.length === 0) {
+      playersDisplay.textContent = 'لم تتم إضافة لاعبين بعد.';
+    } else {
+      playersDisplay.innerHTML = state.players
+        .map(p => `• ${p.name} ${p.note ? '— ' + p.note : ''}`)
+        .join('<br>');
+    }
+
+    const formatBadge = $('formatBadge');
+    let formatText = '';
+    switch (state.format) {
+      case 'groups-knockout':
+        formatText = 'مجموعات ثم إقصائي';
+        break;
+      case 'knockout':
+        formatText = 'نظام إقصائي مباشر';
+        break;
+      case 'league':
+        formatText = 'دوري نقاط (الجميع ضد الجميع)';
+        break;
+      case 'friendly':
+        formatText = 'مباريات ودية حرة';
+        break;
+    }
+    formatBadge.textContent = formatText;
+
+    const summaryParts = [];
+    summaryParts.push(`المنصة: ${state.platform}`);
+    summaryParts.push(`نظام البطولة: ${formatText}`);
+    summaryParts.push(`مدة الشوط: ${state.halfLength} دقائق`);
+    summaryParts.push(`المستوى: ${state.difficulty}`);
+    if (state.duration) summaryParts.push(`المدة: ${state.duration}`);
+    summaryParts.push(`عدد اللاعبين الحالي: ${state.players.length}`);
+    $('summaryText').textContent = summaryParts.join(' | ');
+
+    const rulesDisplay = $('rulesDisplay');
+    rulesDisplay.innerHTML = '';
+    const baseRules = [
+      `مدة الشوط: ${state.halfLength} دقائق`,
+      `مستوى الصعوبة: ${state.difficulty}`,
+      `مساعدة التحكيم: ${state.refAssist}`,
+      `اختيار الفرق: ${state.teamSelection}`,
+      `نظام البطولة: ${formatText}`
+    ];
+    baseRules.concat(state.specialRules.filter(r => r.trim().length > 0))
+      .forEach(rule => {
+        const li = document.createElement('li');
+        li.textContent = rule;
+        rulesDisplay.appendChild(li);
+      });
+
+    const standingsBody = $('standingsBody');
+    standingsBody.innerHTML = '';
+    state.players.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td contenteditable="true">${p.name}</td>
+        <td contenteditable="true">0</td>
+        <td contenteditable="true">0</td>
+        <td contenteditable="true">0</td>
+        <td contenteditable="true">0</td>
+        <td contenteditable="true">0</td>
+        <td contenteditable="true">0</td>
+        <td contenteditable="true">0</td>
+      `;
+      standingsBody.appendChild(tr);
+    });
+  }
+
+  function init() {
+    loadState();
+    render();
+
+    $('saveSettings').onclick = () => {
+      state.tournamentName = $('tournamentName').value.trim() || state.tournamentName;
+      state.platform = $('platform').value;
+      state.format = $('format').value;
+      state.duration = $('duration').value.trim();
+      state.halfLength = parseInt($('halfLength').value, 10) || 5;
+      state.difficulty = $('difficulty').value;
+      state.refAssist = $('refAssist').value;
+      state.teamSelection = $('teamSelection').value;
+      state.specialRules = $('specialRules').value
+        .split('\n')
+        .map(r => r.trim())
+        .filter(r => r.length > 0);
+      saveState();
+      render();
+      $('saveStatus').textContent = 'تم الحفظ ✅';
+      setTimeout(() => $('saveStatus').textContent = '', 2000);
+    };
+
+    $('addPlayer').onclick = () => {
+      const name = $('playerName').value.trim();
+      const note = $('playerNote').value.trim();
+      if (!name) return;
+      state.players.push({ name, note });
+      $('playerName').value = '';
+      $('playerNote').value = '';
+      saveState();
+      render();
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
