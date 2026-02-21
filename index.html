@@ -17,11 +17,15 @@
 
     <script type="text/babel">
       const { useState, useEffect } = React;
+      const ADMIN_PASSWORD = 'Qq112233';
 
       function App() {
-        // --- State Management ---
         const [isAdmin, setIsAdmin] = useState(false);
-        const [activeTab, setActiveTab] = useState('viewer'); // 'viewer' or 'admin'
+        const [activeTab, setActiveTab] = useState('viewer');
+        const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+        const [passwordInput, setPasswordInput] = useState('');
+        const [passwordError, setPasswordError] = useState('');
+
         const [tournamentInfo, setTournamentInfo] = useState({
           name: 'دوري EA FC الرمضاني',
           type: 'دوري (الجميع ضد الجميع)',
@@ -29,23 +33,29 @@
           rules:
             '- مدة الشوط 6 دقائق\n- المستوى محترف\n- يمنع تكرار الفريق في نفس الجولة',
         });
+
         const [players, setPlayers] = useState([
           { id: 1, name: 'أحمد (ريال مدريد)', note: 'بطل النسخة السابقة' },
           { id: 2, name: 'خالد (مانشستر سيتي)', note: '' },
           { id: 3, name: 'عمر (بايرن ميونخ)', note: '' },
           { id: 4, name: 'سعد (برشلونة)', note: '' },
         ]);
+
         const [matches, setMatches] = useState([]);
         const [standings, setStandings] = useState([]);
         const [newPlayer, setNewPlayer] = useState({ name: '', note: '' });
 
         // --- Logic Functions ---
-        // Generate Round Robin Schedule
         const generateSchedule = () => {
           if (players.length < 2) {
             alert('يجب إضافة لاعبين اثنين على الأقل لتوليد الجدول.');
             return;
           }
+          const confirmOverwrite =
+            matches.length === 0 ||
+            confirm('سيتم استبدال جدول المباريات الحالي. هل تريد المتابعة؟');
+          if (!confirmOverwrite) return;
+
           const newMatches = [];
           let matchId = 1;
           for (let i = 0; i < players.length; i++) {
@@ -66,7 +76,6 @@
           calculateStandings(newMatches, players);
         };
 
-        // Calculate Standings
         const calculateStandings = (currentMatches, currentPlayers) => {
           let stats = {};
           currentPlayers.forEach((p) => {
@@ -86,6 +95,7 @@
             if (match.isPlayed && match.score1 !== '' && match.score2 !== '') {
               const s1 = parseInt(match.score1);
               const s2 = parseInt(match.score2);
+              if (Number.isNaN(s1) || Number.isNaN(s2)) return;
               const t1 = match.team1.id;
               const t2 = match.team2.id;
               if (!stats[t1] || !stats[t2]) return;
@@ -133,8 +143,8 @@
           if (!newPlayer.name.trim()) return;
           const addedPlayer = {
             id: Date.now(),
-            name: newPlayer.name,
-            note: newPlayer.note,
+            name: newPlayer.name.trim(),
+            note: newPlayer.note.trim(),
           };
           const updatedPlayers = [...players, addedPlayer];
           setPlayers(updatedPlayers);
@@ -145,7 +155,7 @@
         const handleRemovePlayer = (id) => {
           const updatedPlayers = players.filter((p) => p.id !== id);
           setPlayers(updatedPlayers);
-          // الجدول لن يُعدّل تلقائياً هنا؛ يمكنك إضافة منطق لاحقاً لمسح مباريات هذا اللاعب إن أردت
+          // يمكن لاحقاً إضافة منطق لمسح مباريات هذا اللاعب
         };
 
         const handleMatchScoreChange = (id, field, value) => {
@@ -162,9 +172,10 @@
           setMatches(updatedMatches);
         };
 
+        // --- Viewer UI ---
         const ViewMode = () => (
           <div className="space-y-6">
-            {/* Standings Table */}
+            {/* الترتيب */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-yellow-500 text-lg">🏆</span>
@@ -178,19 +189,11 @@
                       <th className="px-4 py-3 font-semibold">المركز</th>
                       <th className="px-4 py-3 font-semibold">اللاعب</th>
                       <th className="px-4 py-3 font-semibold text-center">لعب</th>
-                      <th className="px-4 py-3 font-semibold text-center text-green-400">
-                        فاز
-                      </th>
-                      <th className="px-4 py-3 font-semibold text-center text-slate-400">
-                        تعادل
-                      </th>
-                      <th className="px-4 py-3 font-semibold text-center text-red-400">
-                        خسر
-                      </th>
+                      <th className="px-4 py-3 font-semibold text-center text-green-400">فاز</th>
+                      <th className="px-4 py-3 font-semibold text-center text-slate-400">تعادل</th>
+                      <th className="px-4 py-3 font-semibold text-center text-red-400">خسر</th>
                       <th className="px-4 py-3 font-semibold text-center">+ / -</th>
-                      <th className="px-4 py-3 font-semibold text-center text-yellow-500 text-base">
-                        النقاط
-                      </th>
+                      <th className="px-4 py-3 font-semibold text-center text-yellow-500 text-base">النقاط</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -199,38 +202,19 @@
                         key={team.id}
                         className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors"
                       >
-                        <td className="px-4 py-3 font-bold text-slate-500">
-                          {index + 1}
-                        </td>
-                        <td className="px-4 py-3 font-medium text-white">
-                          {team.name}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {team.played}
-                        </td>
-                        <td className="px-4 py-3 text-center text-green-400/80">
-                          {team.won}
-                        </td>
-                        <td className="px-4 py-3 text-center text-slate-400/80">
-                          {team.drawn}
-                        </td>
-                        <td className="px-4 py-3 text-center text-red-400/80">
-                          {team.lost}
-                        </td>
-                        <td className="px-4 py-3 text-center" dir="ltr">
-                          {team.gf} : {team.ga}
-                        </td>
-                        <td className="px-4 py-3 text-center font-bold text-yellow-500 text-base">
-                          {team.points}
-                        </td>
+                        <td className="px-4 py-3 font-bold text-slate-500">{index + 1}</td>
+                        <td className="px-4 py-3 font-medium text-white">{team.name}</td>
+                        <td className="px-4 py-3 text-center">{team.played}</td>
+                        <td className="px-4 py-3 text-center text-green-400/80">{team.won}</td>
+                        <td className="px-4 py-3 text-center text-slate-400/80">{team.drawn}</td>
+                        <td className="px-4 py-3 text-center text-red-400/80">{team.lost}</td>
+                        <td className="px-4 py-3 text-center" dir="ltr">{team.gf} : {team.ga}</td>
+                        <td className="px-4 py-3 text-center font-bold text-yellow-500 text-base">{team.points}</td>
                       </tr>
                     ))}
                     {standings.length === 0 && (
                       <tr>
-                        <td
-                          colSpan="8"
-                          className="px-4 py-8 text-center text-slate-500"
-                        >
+                        <td colSpan="8" className="px-4 py-8 text-center text-slate-500">
                           لا يوجد بيانات لعرضها حتى الآن.
                         </td>
                       </tr>
@@ -240,7 +224,7 @@
               </div>
             </div>
 
-            {/* Matches Schedule */}
+            {/* جدول المباريات */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-blue-400 text-lg">📅</span>
@@ -283,7 +267,7 @@
               </div>
             </div>
 
-            {/* Rules */}
+            {/* القوانين */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-purple-400 text-lg">⚠️</span>
@@ -291,9 +275,7 @@
               </div>
               <div className="p-5">
                 <div className="mb-4">
-                  <span className="text-xs text-slate-400 block mb-1">
-                    نوع البطولة:
-                  </span>
+                  <span className="text-xs text-slate-400 block mb-1">نوع البطولة:</span>
                   <span className="text-sm text-white bg-slate-800 px-3 py-1 rounded-md">
                     {tournamentInfo.type}
                   </span>
@@ -306,9 +288,10 @@
           </div>
         );
 
+        // --- Admin UI ---
         const AdminMode = () => (
           <div className="space-y-6">
-            {/* Tournament Settings */}
+            {/* إعدادات البطولة */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-slate-400 text-lg">⚙️</span>
@@ -316,9 +299,7 @@
               </div>
               <div className="p-5 space-y-4">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1.5">
-                    اسم الدوري
-                  </label>
+                  <label className="block text-sm text-slate-400 mb-1.5">اسم الدوري</label>
                   <input
                     type="text"
                     className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all"
@@ -329,9 +310,7 @@
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1.5">
-                    نوع البطولة
-                  </label>
+                  <label className="block text-sm text-slate-400 mb-1.5">نوع البطولة</label>
                   <select
                     className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-yellow-500 transition-all appearance-none"
                     value={tournamentInfo.type}
@@ -345,9 +324,7 @@
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1.5">
-                    مدة الدوري (اختياري)
-                  </label>
+                  <label className="block text-sm text-slate-400 mb-1.5">مدة الدوري (اختياري)</label>
                   <input
                     type="text"
                     className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-yellow-500 transition-all"
@@ -360,18 +337,16 @@
               </div>
             </div>
 
-            {/* Players Management */}
+            {/* إدارة اللاعبين */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-blue-400 text-lg">👥</span>
-                  <h2 className="text-lg font-bold text-white">
-                    اللاعبون ({players.length})
-                  </h2>
+                  <h2 className="text-lg font-bold text-white">اللاعبون ({players.length})</h2>
                 </div>
               </div>
               <div className="p-5">
-                {/* Add Player Form */}
+                {/* نموذج إضافة لاعب */}
                 <div className="flex flex-col md:flex-row gap-3 mb-6 bg-slate-950 p-4 rounded-xl border border-slate-800">
                   <div className="flex-1">
                     <input
@@ -404,7 +379,7 @@
                   </button>
                 </div>
 
-                {/* Players List */}
+                {/* قائمة اللاعبين */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {players.map((player) => (
                     <div
@@ -439,7 +414,7 @@
               </div>
             </div>
 
-            {/* Rules Management */}
+            {/* إدارة القوانين */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
                 <span className="text-purple-400 text-lg">⚠️</span>
@@ -457,23 +432,19 @@
               </div>
             </div>
 
-            {/* Matches Management */}
+            {/* إدارة المباريات */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <span className="text-green-400 text-lg">🎮</span>
-                  <h2 className="text-lg font-bold text-white">
-                    إدارة المباريات والنتائج
-                  </h2>
+                  <h2 className="text-lg font-bold text-white">إدارة المباريات والنتائج</h2>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={generateSchedule}
-                    className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-4 py-2 rounded-lg transition-colors border border-slate-600 flex items-center gap-2"
-                  >
-                    ⟳ توليد الجدول تلقائياً
-                  </button>
-                </div>
+                <button
+                  onClick={generateSchedule}
+                  className="bg-slate-800 hover:bg-slate-700 text-white text-sm px-4 py-2 rounded-lg transition-colors border border-slate-600 flex items-center gap-2"
+                >
+                  ⟳ توليد الجدول تلقائياً
+                </button>
               </div>
               <div className="p-4 space-y-3">
                 {matches.length === 0 ? (
@@ -487,7 +458,7 @@
                 ) : (
                   <>
                     <div className="text-xs text-yellow-500/80 mb-4 bg-yellow-500/10 p-3 rounded-lg border border-yellow-500/20">
-                      تنبيه: أدخل النتائج في المربعات أدناه. سيتم احتساب الترتيب تلقائياً عند الضغط على "حفظ الإعدادات وتحديث الترتيب".
+                      أدخل النتائج في المربعات أدناه. سيتم احتساب الترتيب عند الضغط على "حفظ الإعدادات وتحديث الترتيب".
                     </div>
                     <div className="space-y-3">
                       {matches.map((match) => (
@@ -560,7 +531,7 @@
               </div>
             </div>
 
-            {/* Admin Actions */}
+            {/* أدوات المنظم */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg p-5">
               <h3 className="text-sm font-bold text-slate-400 mb-4">
                 أدوات المنظم
@@ -569,7 +540,7 @@
                 <button
                   onClick={() => {
                     calculateStandings(matches, players);
-                    alert('تم تحديث الترتيب وحفظ الإعدادات بنجاح!');
+                    alert('تم تحديث الترتيب بنجاح!');
                   }}
                   className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold px-6 py-3 rounded-xl transition-colors flex items-center gap-2 flex-1 justify-center min-w-[200px]"
                 >
@@ -589,11 +560,26 @@
           </div>
         );
 
+        const handleAdminLogin = () => {
+          setPasswordInput('');
+          setPasswordError('');
+          setShowPasswordPrompt(true);
+        };
+
+        const handleConfirmPassword = () => {
+          if (passwordInput === ADMIN_PASSWORD) {
+            setIsAdmin(true);
+            setActiveTab('admin');
+            setShowPasswordPrompt(false);
+            setPasswordInput('');
+            setPasswordError('');
+          } else {
+            setPasswordError('كلمة المرور غير صحيحة');
+          }
+        };
+
         return (
-          <div
-            dir="rtl"
-            className="min-h-screen bg-slate-950 text-slate-200 font-sans pb-20"
-          >
+          <div className="min-h-screen bg-slate-950 text-slate-200 font-sans pb-20" dir="rtl">
             {/* Header */}
             <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-md">
               <div className="max-w-4xl mx-auto px-4 py-4">
@@ -613,7 +599,7 @@
                   </div>
                   {!isAdmin && (
                     <button
-                      onClick={() => setIsAdmin(true)}
+                      onClick={handleAdminLogin}
                       className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-full border border-slate-700 transition-colors"
                     >
                       🔑 دخول المدير
@@ -626,7 +612,7 @@
                     </div>
                   )}
                 </div>
-                {/* Navigation Tabs */}
+                {/* Tabs */}
                 <div className="flex bg-slate-950 rounded-xl p-1 border border-slate-800">
                   <button
                     onClick={() => setActiveTab('viewer')}
@@ -654,10 +640,55 @@
               </div>
             </header>
 
-            {/* Main Content Area */}
+            {/* Main */}
             <main className="max-w-4xl mx-auto px-4 py-6">
               {activeTab === 'viewer' ? <ViewMode /> : <AdminMode />}
             </main>
+
+            {/* Password Modal */}
+            {showPasswordPrompt && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20">
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4">
+                  <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    🔑 تسجيل دخول المدير
+                  </h2>
+                  <p className="text-xs text-slate-400 mb-4">
+                    أدخل كلمة المرور لتفعيل وضع الإدارة. هذه الخطوة لا تؤثر إلا على هذا المتصفح.
+                  </p>
+                  <input
+                    type="password"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-500 mb-2"
+                    placeholder="كلمة المرور"
+                    value={passwordInput}
+                    onChange={(e) => {
+                      setPasswordInput(e.target.value);
+                      setPasswordError('');
+                    }}
+                  />
+                  {passwordError && (
+                    <p className="text-xs text-red-400 mb-2">{passwordError}</p>
+                  )}
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button
+                      className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700"
+                      onClick={() => {
+                        setShowPasswordPrompt(false);
+                        setPasswordInput('');
+                        setPasswordError('');
+                      }}
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      className="text-xs px-3 py-1.5 rounded-lg bg-yellow-500 text-slate-900 font-bold"
+                      onClick={handleConfirmPassword}
+                    >
+                      تأكيد
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
       }
