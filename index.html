@@ -225,7 +225,7 @@
 
     h2 { margin: 0; }
 
-    /* PAGE SECTIONS ("pseudo-pages") */
+    /* PAGE SECTIONS (pseudo-pages) */
     .page-section { display: none; }
     .page-section.active { display: block; }
 
@@ -453,6 +453,13 @@
     @media (max-width: 640px) {
       table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     }
+
+    .export-area {
+      width: 100%;
+      min-height: 90px;
+      font-family: monospace;
+      font-size: 11px;
+    }
   </style>
 </head>
 <body>
@@ -478,7 +485,11 @@
       </div>
     </div>
     <nav class="nav-row">
-      <button class="nav-pill active" data-page="overview">
+      <button class="nav-pill active" data-page="about">
+        <span class="icon">✨</span>
+        <span>عن الدوري</span>
+      </button>
+      <button class="nav-pill" data-page="overview">
         <span class="icon">🏠</span>
         <span>نظرة عامة</span>
       </button>
@@ -503,8 +514,35 @@
 </header>
 
 <div class="page">
+  <!-- صفحة: عن الدوري -->
+  <div class="page-section active" id="page-about">
+    <div class="panel panel-soft">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
+          <span>عن الدوري</span>
+        </div>
+        <span class="panel-subtitle">صفحة ترحيبية للاعبين والمنظمين</span>
+      </div>
+      <div class="small-text" id="aboutSummary"></div>
+      <ul class="list-dot" id="aboutDetails" style="margin-top:8px;"></ul>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span class="panel-title-pill"></span>
+          <span>لمن هذه الصفحة؟</span>
+        </div>
+      </div>
+      <div class="small-text">
+        • <strong>المنظِّم</strong>: يستخدم صفحة الإعدادات لضبط نوع البطولة، إضافة اللاعبين، والقوانين.<br>
+        • <strong>اللاعبون</strong>: يدخلون غالباً لصفحات "جدول المباريات"، "الترتيب"، و"القوانين" لمعرفة وضعهم في البطولة.
+      </div>
+    </div>
+  </div>
+
   <!-- صفحة: نظرة عامة -->
-  <div class="page-section active" id="page-overview">
+  <div class="page-section" id="page-overview">
     <div class="panel panel-soft">
       <div class="panel-header">
         <div class="panel-title">
@@ -551,6 +589,10 @@
         <button class="settings-tab" data-settings="rules">
           <span>📜</span>
           <span>تعديل القوانين</span>
+        </button>
+        <button class="settings-tab" data-settings="backup">
+          <span>💾</span>
+          <span>نسخ احتياطي / استيراد</span>
         </button>
       </div>
 
@@ -640,6 +682,17 @@
         <div class="small-text">سيتم عرض هذه القوانين في صفحة القوانين بشكل منظم.</div>
       </div>
 
+      <!-- نسخ احتياطي / استيراد -->
+      <div class="settings-section" id="settings-backup">
+        <label>تصدير / استيراد إعدادات الدوري</label>
+        <textarea id="backupArea" class="export-area" placeholder="اضغط على \"تصدير الإعدادات\" لنسخ بيانات الدوري، أو ألصق بيانات سابقة ثم اضغط \"استيراد الإعدادات\"."></textarea>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+          <button id="exportState" class="btn-secondary">تصدير الإعدادات</button>
+          <button id="importState">استيراد الإعدادات</button>
+          <div class="small-text">يمكنك حفظ النص في ملف أو في محادثة، ثم استعادته لاحقاً.</div>
+        </div>
+      </div>
+
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px;">
         <div style="display:flex;align-items:center;gap:6px;">
           <button id="saveSettings">
@@ -660,7 +713,11 @@
           <span class="panel-title-pill"></span>
           <span>جدول المباريات</span>
         </div>
-        <span class="panel-subtitle">املأ النتائج مباشرة بعد نهاية كل مباراة</span>
+        <span class="panel-subtitle">يمكن توليد الجدول تلقائياً حسب نوع البطولة أو تعبئته يدوياً</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+        <button id="generateLeague" class="btn-secondary">توليد جدول دوري (Round-robin)</button>
+        <button id="generateKnockout" class="btn-secondary">توليد جدول كأس (إقصائي)</button>
       </div>
       <table id="matchesTable">
         <thead>
@@ -680,7 +737,7 @@
           </tr>
         </tbody>
       </table>
-      <div class="table-caption">الصفوف قابلة للتعديل مباشرة، ويمكنك إضافة صفوف جديدة بالنسخ واللصق.</div>
+      <div class="table-caption">الصفوف قابلة للتعديل مباشرة، ويمكنك إضافة صفوف جديدة بالنسخ واللصق. صيغة النتيجة المفضلة: 1-3</div>
     </div>
   </div>
 
@@ -692,7 +749,11 @@
           <span class="panel-title-pill"></span>
           <span>ترتيب الدوري (Standings)</span>
         </div>
-        <span class="panel-subtitle">يتم إنشاء صف لكل لاعب تلقائياً – عدّل الأرقام يدوياً</span>
+        <span class="panel-subtitle">يمكن تحديث الجدول تلقائياً بناءً على نتائج المباريات</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;align-items:center;">
+        <button id="recalculateStandings">تحديث الترتيب من النتائج</button>
+        <div class="small-text">يتم احتساب: لعب، فاز، تعادل، خسر، له، عليه، النقاط (فوز=3، تعادل=1، خسارة=0).</div>
       </div>
       <table id="standingsTable">
         <thead>
@@ -709,7 +770,6 @@
         </thead>
         <tbody id="standingsBody"></tbody>
       </table>
-      <div class="table-caption">نظام نقاط شائع: الفوز = 3، التعادل = 1، الخسارة = 0.</div>
     </div>
   </div>
 
@@ -769,6 +829,23 @@
       case 'friendly': return 'مباريات ودية حرة';
       default: return 'غير محدد';
     }
+  }
+
+  function renderAbout() {
+    const details = [];
+    details.push(`اسم الدوري: ${state.tournamentName}`);
+    details.push(`المنصة الأساسية: ${state.platform}`);
+    details.push(`نوع البطولة: ${formatTextKey(state.format)}`);
+    if (state.duration) details.push(`مدة الدوري: ${state.duration}`);
+    details.push(`عدد اللاعبين الحالي: ${state.players.length}`);
+    $('aboutSummary').textContent = 'هذا الدوري مخصص لكم أنتم وأصدقاؤكم لإضافة منافسة ممتعة ومنظمة على EA FC 26.';
+    const list = $('aboutDetails');
+    list.innerHTML = '';
+    details.forEach(d => {
+      const li = document.createElement('li');
+      li.textContent = d;
+      list.appendChild(li);
+    });
   }
 
   function render() {
@@ -859,6 +936,117 @@
       `;
       standingsBody.appendChild(tr);
     });
+
+    renderAbout();
+  }
+
+  function generateLeagueSchedule() {
+    const tbody = document.querySelector('#matchesTable tbody');
+    tbody.innerHTML = '';
+    const players = state.players.map(p => p.name).filter(n => n.trim().length > 0);
+    if (players.length < 2) {
+      alert('يجب إضافة لاعبين على الأقل لتوليد جدول الدوري.');
+      return;
+    }
+    for (let i = 0; i < players.length; i++) {
+      for (let j = i + 1; j < players.length; j++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td contenteditable="true">-</td>
+          <td contenteditable="true">-</td>
+          <td contenteditable="true">${players[i]} vs ${players[j]}</td>
+          <td contenteditable="true">-</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+  }
+
+  function generateKnockoutSchedule() {
+    const tbody = document.querySelector('#matchesTable tbody');
+    tbody.innerHTML = '';
+    const players = state.players.map(p => p.name).filter(n => n.trim().length > 0);
+    if (players.length < 2) {
+      alert('يجب إضافة لاعبين على الأقل لتوليد جدول الكأس.');
+      return;
+    }
+    for (let i = 0; i < players.length; i += 2) {
+      const p1 = players[i];
+      const p2 = players[i + 1];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td contenteditable="true">-</td>
+        <td contenteditable="true">-</td>
+        <td contenteditable="true">${p1}${p2 ? ' vs ' + p2 : ' (يتأهل تلقائياً)'} </td>
+        <td contenteditable="true">-</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function parseResult(resultStr) {
+    const m = resultStr.trim().match(/^(\d+)\s*[-:]\s*(\d+)$/);
+    if (!m) return null;
+    return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
+  }
+
+  function recalculateStandings() {
+    const stats = {};
+    state.players.forEach(p => {
+      stats[p.name] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
+    });
+    const rows = document.querySelectorAll('#matchesTable tbody tr');
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length < 4) return;
+      const matchCell = cells[2].textContent || '';
+      const resultCell = cells[3].textContent || '';
+      if (!matchCell.includes('vs')) return;
+      const [homeNameRaw, awayNameRaw] = matchCell.split('vs');
+      const homeName = homeNameRaw.trim();
+      const awayName = awayNameRaw.replace('(يتأهل تلقائياً)', '').trim();
+      const res = parseResult(resultCell);
+      if (!res) return;
+      if (!stats[homeName] || !stats[awayName]) return;
+      const { home, away } = res;
+      stats[homeName].played++;
+      stats[awayName].played++;
+      stats[homeName].gf += home;
+      stats[homeName].ga += away;
+      stats[awayName].gf += away;
+      stats[awayName].ga += home;
+      if (home > away) {
+        stats[homeName].won++;
+        stats[homeName].pts += 3;
+        stats[awayName].lost++;
+      } else if (home < away) {
+        stats[awayName].won++;
+        stats[awayName].pts += 3;
+        stats[homeName].lost++;
+      } else {
+        stats[homeName].drawn++;
+        stats[awayName].drawn++;
+        stats[homeName].pts += 1;
+        stats[awayName].pts += 1;
+      }
+    });
+    const standingsBody = $('standingsBody');
+    standingsBody.innerHTML = '';
+    const entries = Object.entries(stats).sort((a, b) => b[1].pts - a[1].pts || (b[1].gf - b[1].ga) - (a[1].gf - a[1].ga));
+    entries.forEach(([name, s]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${name}</td>
+        <td>${s.played}</td>
+        <td>${s.won}</td>
+        <td>${s.drawn}</td>
+        <td>${s.lost}</td>
+        <td>${s.gf}</td>
+        <td>${s.ga}</td>
+        <td>${s.pts}</td>
+      `;
+      standingsBody.appendChild(tr);
+    });
   }
 
   function init() {
@@ -895,12 +1083,12 @@
       render();
     };
 
-    // Settings internal tabs
     const settingsTabs = document.querySelectorAll('.settings-tab');
     const settingsSections = {
       basic: document.getElementById('settings-basic'),
       players: document.getElementById('settings-players'),
-      rules: document.getElementById('settings-rules')
+      rules: document.getElementById('settings-rules'),
+      backup: document.getElementById('settings-backup')
     };
 
     settingsTabs.forEach(tab => {
@@ -914,9 +1102,9 @@
       });
     });
 
-    // Top navigation between pseudo-pages
     const navButtons = document.querySelectorAll('.nav-pill');
     const pageSections = {
+      about: document.getElementById('page-about'),
       overview: document.getElementById('page-overview'),
       settings: document.getElementById('page-settings'),
       matches: document.getElementById('page-matches'),
@@ -939,6 +1127,26 @@
         showPage(page);
       });
     });
+
+    $('generateLeague').onclick = () => generateLeagueSchedule();
+    $('generateKnockout').onclick = () => generateKnockoutSchedule();
+    $('recalculateStandings').onclick = () => recalculateStandings();
+
+    $('exportState').onclick = () => {
+      $('backupArea').value = JSON.stringify(state, null, 2);
+    };
+
+    $('importState').onclick = () => {
+      try {
+        const imported = JSON.parse($('backupArea').value);
+        Object.assign(state, imported);
+        saveState();
+        render();
+        alert('تم استيراد الإعدادات بنجاح.');
+      } catch (e) {
+        alert('فشل استيراد الإعدادات. تأكد من صحة النص.');
+      }
+    };
   }
 
   document.addEventListener('DOMContentLoaded', init);
