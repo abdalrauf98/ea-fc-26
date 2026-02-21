@@ -23,9 +23,7 @@
       --radius-pill: 999px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -35,32 +33,40 @@
       min-height: 100vh;
     }
 
-    /* HEADER */
+    a { color: inherit; text-decoration: none; }
+
+    /* HEADER + NAV */
     header {
       position: sticky;
       top: 0;
-      z-index: 20;
-      backdrop-filter: blur(16px);
+      z-index: 30;
+      backdrop-filter: blur(18px);
       background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.94));
-      border-bottom: 1px solid rgba(55,65,81,0.8);
+      border-bottom: 1px solid rgba(55,65,81,0.85);
       box-shadow: 0 18px 45px rgba(15,23,42,0.9);
     }
 
-    .hero-inner {
+    .header-inner {
       max-width: 1120px;
       margin: 0 auto;
-      padding: 16px 16px 14px;
+      padding: 10px 14px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .hero-row {
       display: flex;
       align-items: center;
-      gap: 14px;
       justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
     }
 
     .hero-main {
       display: flex;
       align-items: center;
-      gap: 12px;
-      flex: 1;
+      gap: 10px;
       min-width: 0;
     }
 
@@ -93,22 +99,21 @@
       text-overflow: ellipsis;
     }
 
-    .hero-badges {
+    .hero-meta {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 999px;
       border: 1px solid rgba(55,65,81,0.9);
-      background: radial-gradient(circle at 0 0, rgba(148,163,184,0.18), rgba(15,23,42,0.9));
+      background: radial-gradient(circle at 0 0, rgba(148,163,184,0.18), rgba(15,23,42,0.95));
       font-size: 11px;
       color: var(--text-muted);
       white-space: nowrap;
@@ -124,83 +129,102 @@
 
     .chip-accent {
       border-color: rgba(234,179,8,0.55);
-      background: radial-gradient(circle at 0 0, rgba(234,179,8,0.16), rgba(15,23,42,0.96));
+      background: radial-gradient(circle at 0 0, rgba(234,179,8,0.2), rgba(15,23,42,0.98));
+      color: var(--accent-strong);
+    }
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+    }
+
+    .nav-pill {
+      flex: 0 0 auto;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.95);
+      background: radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 5px 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .nav-pill span.icon { font-size: 13px; }
+
+    .nav-pill.active {
+      border-color: rgba(234,179,8,0.9);
+      background: radial-gradient(circle at top left, rgba(234,179,8,0.22), rgba(15,23,42,0.98));
       color: var(--accent-strong);
     }
 
     @media (max-width: 640px) {
-      .hero-inner {
+      .hero-row {
         flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding-bottom: 12px;
+        align-items: flex-start;
       }
-      .hero-text h1 {
-        font-size: 16px;
-      }
-      .hero-text p {
-        white-space: normal;
-      }
-      .hero-badges {
-        justify-content: flex-start;
-      }
+      .hero-text p { white-space: normal; }
+      .hero-meta { align-items: flex-start; }
     }
 
-    /* LAYOUT */
+    /* PAGE LAYOUT */
     .page {
       max-width: 1120px;
       margin: 0 auto;
-      padding: 18px 16px 28px;
+      padding: 16px 14px 28px;
     }
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.85fr);
-      gap: 18px;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.9fr);
+      gap: 16px;
       align-items: flex-start;
     }
 
     @media (max-width: 960px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
+      .layout { grid-template-columns: 1fr; }
     }
 
     .panel {
-      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.94));
+      background: linear-gradient(145deg, rgba(15,23,42,0.98), rgba(15,23,42,0.96));
       border-radius: var(--radius-lg);
       border: 1px solid rgba(31,41,55,0.9);
-      padding: 14px 14px 16px;
+      padding: 13px 13px 15px;
       box-shadow: var(--shadow-soft);
-    }
-
-    .panel + .panel {
-      margin-top: 14px;
+      margin-bottom: 12px;
     }
 
     .panel-soft {
-      background: radial-gradient(circle at top left, rgba(30,64,175,0.12), rgba(15,23,42,0.96));
+      background: radial-gradient(circle at top left, rgba(30,64,175,0.14), rgba(15,23,42,0.98));
     }
 
     .panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
 
     .panel-title {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       font-size: 14px;
       font-weight: 600;
     }
 
     .panel-title-pill {
       width: 3px;
-      height: 20px;
+      height: 18px;
       border-radius: 999px;
       background: linear-gradient(to bottom, var(--accent), #f97316);
     }
@@ -210,15 +234,13 @@
       color: var(--text-soft);
     }
 
-    h2 {
-      margin: 0;
-    }
+    h2 { margin: 0; }
 
     /* FORM ELEMENTS */
     label {
       display: block;
       font-size: 12px;
-      margin-top: 9px;
+      margin-top: 8px;
       margin-bottom: 3px;
       color: var(--text-main);
     }
@@ -247,24 +269,17 @@
       background: radial-gradient(circle at top left, rgba(15,23,42,0.98), rgba(15,23,42,1));
     }
 
-    textarea {
-      min-height: 70px;
-      resize: vertical;
-    }
+    textarea { min-height: 70px; resize: vertical; }
 
     .field-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .field-row > div {
-      flex: 1;
-    }
+    .field-row > div { flex: 1; }
 
     @media (max-width: 640px) {
-      .field-row {
-        flex-direction: column;
-      }
+      .field-row { flex-direction: column; }
     }
 
     /* BUTTONS */
@@ -281,7 +296,7 @@
       background: radial-gradient(circle at top left, var(--accent), #f97316);
       color: #111827;
       box-shadow: 0 10px 25px rgba(15,23,42,0.9);
-      margin-top: 9px;
+      margin-top: 8px;
       transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
     }
 
@@ -357,11 +372,7 @@
       margin-top: 4px;
     }
 
-    .list-dot {
-      list-style: none;
-      padding: 0;
-      margin: 4px 0 0;
-    }
+    .list-dot { list-style: none; padding: 0; margin: 4px 0 0; }
 
     .list-dot li {
       position: relative;
@@ -418,9 +429,7 @@
       background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.94));
     }
 
-    td[contenteditable="true"] {
-      cursor: text;
-    }
+    td[contenteditable="true"] { cursor: text; }
 
     td[contenteditable="true"]:focus {
       outline: 1px solid rgba(234,179,8,0.8);
@@ -445,37 +454,65 @@
 <body>
 
 <header>
-  <div class="hero-inner">
-    <div class="hero-main">
-      <div class="hero-logo">⚽</div>
-      <div class="hero-text">
-        <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
-        <p>لوحة تحكم بسيطة لإدارة دوري الأصدقاء على البلايستيشن في أجواء رمضانية</p>
+  <div class="header-inner">
+    <div class="hero-row">
+      <div class="hero-main">
+        <div class="hero-logo">⚽</div>
+        <div class="hero-text">
+          <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
+          <p>لوحة تحكم بسيطة لإدارة دوري الأصدقاء على البلايستيشن في أجواء رمضانية</p>
+        </div>
+      </div>
+      <div class="hero-meta">
+        <div class="chip">
+          <span class="chip-dot"></span>
+          يعمل مباشرة في المتصفح – بدون تسجيل دخول
+        </div>
+        <div class="chip chip-accent">
+          يحفظ الإعدادات محلياً على هذا الجهاز
+        </div>
       </div>
     </div>
-    <div class="hero-badges">
-      <div class="chip">
-        <span class="chip-dot"></span>
-        مباشر على جهازك – بدون تسجيل دخول
-      </div>
-      <div class="chip chip-accent">
-        يحفظ الإعدادات محلياً في المتصفح
-      </div>
-    </div>
+    <nav class="nav-row">
+      <button class="nav-pill active" data-target="section-overview">
+        <span class="icon">🏠</span>
+        <span>نظرة عامة</span>
+      </button>
+      <button class="nav-pill" data-target="section-settings">
+        <span class="icon">⚙️</span>
+        <span>إعدادات الدوري</span>
+      </button>
+      <button class="nav-pill" data-target="section-players">
+        <span class="icon">👥</span>
+        <span>اللاعبون</span>
+      </button>
+      <button class="nav-pill" data-target="section-matches">
+        <span class="icon">📅</span>
+        <span>جدول المباريات</span>
+      </button>
+      <button class="nav-pill" data-target="section-standings">
+        <span class="icon">📊</span>
+        <span>الترتيب</span>
+      </button>
+      <button class="nav-pill" data-target="section-rules">
+        <span class="icon">📜</span>
+        <span>القوانين</span>
+      </button>
+    </nav>
   </div>
 </header>
 
 <div class="page">
   <div class="layout">
-    <!-- الإعدادات -->
-    <div>
+    <!-- الجانب الأيسر: الإعدادات -->
+    <div id="section-settings">
       <div class="panel panel-soft">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
             <span>إعدادات الدوري</span>
           </div>
-          <span class="panel-subtitle">اضبط الأساسيات مرة واحدة ثم عدّل متى شئت</span>
+          <span class="panel-subtitle">اضبط اسم الدوري والمنصة ونظام البطولة</span>
         </div>
 
         <label>اسم الدوري</label>
@@ -502,7 +539,7 @@
         <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان، أو من 10 إلى 20 رمضان">
       </div>
 
-      <div class="panel">
+      <div class="panel" id="section-match-settings">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
@@ -560,7 +597,7 @@
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="section-players">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
@@ -586,9 +623,9 @@
       </div>
     </div>
 
-    <!-- العرض والتفاعلات -->
+    <!-- الجانب الأيمن: العرض -->
     <div>
-      <div class="panel panel-soft">
+      <div class="panel panel-soft" id="section-overview">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
@@ -610,7 +647,7 @@
         <div id="playersDisplay" class="small-text"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="section-matches">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
@@ -639,7 +676,7 @@
         <div class="table-caption">الصفوف قابلة للتعديل مباشرة، ويمكنك إضافة صفوف جديدة بالنسخ واللصق.</div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="section-standings">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
@@ -665,7 +702,7 @@
         <div class="table-caption">نظام نقاط شائع: الفوز = 3، التعادل = 1، الخسارة = 0.</div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="section-rules">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
@@ -710,22 +747,15 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
-  function $(id) {
-    return document.getElementById(id);
-  }
+  function $(id) { return document.getElementById(id); }
 
   function formatTextKey(format) {
     switch (format) {
-      case 'groups-knockout':
-        return 'مجموعات ثم إقصائي';
-      case 'knockout':
-        return 'نظام إقصائي مباشر';
-      case 'league':
-        return 'دوري نقاط (الجميع ضد الجميع)';
-      case 'friendly':
-        return 'مباريات ودية حرة';
-      default:
-        return 'غير محدد';
+      case 'groups-knockout': return 'مجموعات ثم إقصائي';
+      case 'knockout': return 'نظام إقصائي مباشر';
+      case 'league': return 'دوري نقاط (الجميع ضد الجميع)';
+      case 'friendly': return 'مباريات ودية حرة';
+      default: return 'غير محدد';
     }
   }
 
@@ -852,6 +882,23 @@
       saveState();
       render();
     };
+
+    // Smooth navigation between sections
+    const navButtons = document.querySelectorAll('.nav-pill');
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const targetEl = document.getElementById(targetId);
+        if (targetEl) {
+          window.scrollTo({
+            top: targetEl.getBoundingClientRect().top + window.scrollY - 90,
+            behavior: 'smooth'
+          });
+        }
+        navButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
   }
 
   document.addEventListener('DOMContentLoaded', init);
