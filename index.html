@@ -236,6 +236,38 @@
 
     h2 { margin: 0; }
 
+    /* SETTINGS TABS */
+    .settings-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .settings-tab {
+      flex: 0 0 auto;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55,65,81,0.95);
+      background: radial-gradient(circle at top left, rgba(15,23,42,1), rgba(15,23,42,0.98));
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 5px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .settings-tab.active {
+      border-color: rgba(234,179,8,0.9);
+      background: radial-gradient(circle at top left, rgba(234,179,8,0.18), rgba(15,23,42,0.98));
+      color: var(--accent-strong);
+    }
+
+    .settings-section { display: none; }
+    .settings-section.active { display: block; }
+
     /* FORM ELEMENTS */
     label {
       display: block;
@@ -271,16 +303,10 @@
 
     textarea { min-height: 70px; resize: vertical; }
 
-    .field-row {
-      display: flex;
-      gap: 8px;
-    }
-
+    .field-row { display: flex; gap: 8px; }
     .field-row > div { flex: 1; }
 
-    @media (max-width: 640px) {
-      .field-row { flex-direction: column; }
-    }
+    @media (max-width: 640px) { .field-row { flex-direction: column; } }
 
     /* BUTTONS */
     button {
@@ -345,10 +371,7 @@
       max-width: 100%;
     }
 
-    .player-pill-main {
-      font-weight: 500;
-      white-space: nowrap;
-    }
+    .player-pill-main { font-weight: 500; white-space: nowrap; }
 
     .player-pill-note {
       font-size: 11px;
@@ -366,11 +389,7 @@
       box-shadow: none;
     }
 
-    .small-text {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 4px;
-    }
+    .small-text { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
 
     .list-dot { list-style: none; padding: 0; margin: 4px 0 0; }
 
@@ -436,18 +455,10 @@
       background: rgba(15,23,42,1);
     }
 
-    .table-caption {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 5px;
-    }
+    .table-caption { font-size: 11px; color: var(--text-soft); margin-top: 5px; }
 
     @media (max-width: 640px) {
-      table {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
+      table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     }
   </style>
 </head>
@@ -460,7 +471,7 @@
         <div class="hero-logo">⚽</div>
         <div class="hero-text">
           <h1 id="title-display">دوري EA FC 26 الرمضاني</h1>
-          <p>لوحة تحكم بسيطة لإدارة دوري الأصدقاء على البلايستيشن في أجواء رمضانية</p>
+          <p>لوحة تحكم لإدارة دوري الأصدقاء على البلايستيشن – إعدادات، جدول، وترتيب</p>
         </div>
       </div>
       <div class="hero-meta">
@@ -480,11 +491,7 @@
       </button>
       <button class="nav-pill" data-target="section-settings">
         <span class="icon">⚙️</span>
-        <span>إعدادات الدوري</span>
-      </button>
-      <button class="nav-pill" data-target="section-players">
-        <span class="icon">👥</span>
-        <span>اللاعبون</span>
+        <span>صفحة الإعدادات</span>
       </button>
       <button class="nav-pill" data-target="section-matches">
         <span class="icon">📅</span>
@@ -504,122 +511,127 @@
 
 <div class="page">
   <div class="layout">
-    <!-- الجانب الأيسر: الإعدادات -->
+    <!-- صفحة الإعدادات الكاملة -->
     <div id="section-settings">
       <div class="panel panel-soft">
         <div class="panel-header">
           <div class="panel-title">
             <span class="panel-title-pill"></span>
-            <span>إعدادات الدوري</span>
+            <span>صفحة الإعدادات</span>
           </div>
-          <span class="panel-subtitle">اضبط اسم الدوري والمنصة ونظام البطولة</span>
+          <span class="panel-subtitle">هنا تضبط كل شيء: نوع البطولة، اللاعبين، والقوانين</span>
         </div>
 
-        <label>اسم الدوري</label>
-        <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
-        <div class="field-hint">يمكنك وضع اسم مخصص مثل: دوري الشباب الرمضاني 1447هـ</div>
-
-        <label>المنصة</label>
-        <select id="platform">
-          <option value="PlayStation" selected>PlayStation (اللعب جنب بعض)</option>
-          <option value="Xbox">Xbox</option>
-          <option value="PC">PC</option>
-          <option value="Mixed">منصات متعددة</option>
-        </select>
-
-        <label>نظام البطولة</label>
-        <select id="format">
-          <option value="groups-knockout">مجموعات ثم إقصائي</option>
-          <option value="knockout">إقصائي مباشر (خروج المغلوب)</option>
-          <option value="league">دوري نقاط (الجميع ضد الجميع)</option>
-          <option value="friendly">مباريات ودية حرة</option>
-        </select>
-
-        <label>مدة الدوري (وصف حر)</label>
-        <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان، أو من 10 إلى 20 رمضان">
-      </div>
-
-      <div class="panel" id="section-match-settings">
-        <div class="panel-header">
-          <div class="panel-title">
-            <span class="panel-title-pill"></span>
-            <span>إعدادات المباراة</span>
-          </div>
-          <span class="panel-subtitle">تطبَّق على جميع المباريات إلا إذا اتفقتم على غير ذلك</span>
+        <div class="settings-tabs">
+          <button class="settings-tab active" data-settings="basic">
+            <span>🧩</span>
+            <span>إعدادات أساسية / نوع البطولة</span>
+          </button>
+          <button class="settings-tab" data-settings="players">
+            <span>👥</span>
+            <span>إضافة / حذف اللاعبين</span>
+          </button>
+          <button class="settings-tab" data-settings="rules">
+            <span>📜</span>
+            <span>تعديل القوانين</span>
+          </button>
         </div>
 
-        <div class="field-row">
-          <div>
-            <label>مدة الشوط (بالدقائق)</label>
-            <input id="halfLength" type="number" min="3" max="10" value="5">
+        <!-- إعدادات أساسية -->
+        <div class="settings-section active" id="settings-basic">
+          <label>اسم الدوري</label>
+          <input id="tournamentName" type="text" value="دوري EA FC 26 الرمضاني">
+          <div class="field-hint">مثال: دوري الشباب الرمضاني 1447هـ</div>
+
+          <label>المنصة</label>
+          <select id="platform">
+            <option value="PlayStation" selected>PlayStation (اللعب جنب بعض)</option>
+            <option value="Xbox">Xbox</option>
+            <option value="PC">PC</option>
+            <option value="Mixed">منصات متعددة</option>
+          </select>
+
+          <label>نوع البطولة / نظامها</label>
+          <select id="format">
+            <option value="league">دوري (الجميع يلعب ضد الجميع)</option>
+            <option value="knockout">كأس – إقصائي مباشر (خروج المغلوب)</option>
+            <option value="groups-knockout">مجموعات ثم كأس (مجموعات ثم إقصائي)</option>
+            <option value="friendly">مباريات ودية حرة</option>
+          </select>
+
+          <label>مدة الدوري (وصف حر)</label>
+          <input id="duration" type="text" placeholder="مثال: طوال شهر رمضان، أو من 10 إلى 20 رمضان">
+
+          <div class="field-row">
+            <div>
+              <label>مدة الشوط (بالدقائق)</label>
+              <input id="halfLength" type="number" min="3" max="10" value="5">
+            </div>
+            <div>
+              <label>مستوى الصعوبة</label>
+              <select id="difficulty">
+                <option value="محترف">محترف</option>
+                <option value="عالمي">عالمي</option>
+                <option value="أسطوري">أسطوري</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label>مستوى الصعوبة</label>
-            <select id="difficulty">
-              <option value="محترف">محترف</option>
-              <option value="عالمي">عالمي</option>
-              <option value="أسطوري">أسطوري</option>
-            </select>
+
+          <div class="field-row">
+            <div>
+              <label>مساعدة التحكيم</label>
+              <select id="refAssist">
+                <option value="مساعدة كاملة">مساعدة كاملة</option>
+                <option value="جزئية">جزئية</option>
+                <option value="بدون مساعدة">بدون مساعدة</option>
+              </select>
+            </div>
+            <div>
+              <label>اختيار الفرق</label>
+              <select id="teamSelection">
+                <option value="حر">حرية اختيار أي فريق</option>
+                <option value="دوريات محددة">فرق من دوريات محددة فقط</option>
+                <option value="منتخبات">منتخبات فقط</option>
+                <option value="مستويات متقاربة">فرق من نفس المستوى</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div class="field-row">
-          <div>
-            <label>مساعدة التحكيم</label>
-            <select id="refAssist">
-              <option value="مساعدة كاملة">مساعدة كاملة</option>
-              <option value="جزئية">جزئية</option>
-              <option value="بدون مساعدة">بدون مساعدة</option>
-            </select>
+        <!-- إدارة اللاعبين -->
+        <div class="settings-section" id="settings-players">
+          <label>اسم اللاعب / الكنية</label>
+          <input id="playerName" type="text" placeholder="مثال: أبو فلان، أو PSN ID">
+
+          <label>ملاحظات (اختياري: الفريق المفضل، المنصة...)</label>
+          <input id="playerNote" type="text" placeholder="مثال: PSG - PS5">
+
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button id="addPlayer">
+              <span>إضافة لاعب</span>
+            </button>
+            <div class="small-text">يمكنك تعديل القائمة في أي وقت، حتى أثناء سير الدوري</div>
           </div>
-          <div>
-            <label>اختيار الفرق</label>
-            <select id="teamSelection">
-              <option value="حر">حرية اختيار أي فريق</option>
-              <option value="دوريات محددة">فرق من دوريات محددة فقط</option>
-              <option value="منتخبات">منتخبات فقط</option>
-              <option value="مستويات متقاربة">فرق من نفس المستوى</option>
-            </select>
-          </div>
+
+          <div id="playersList" style="margin-top:10px;"></div>
         </div>
 
-        <label>قوانين خاصة (سطر لكل قاعدة)</label>
-        <textarea id="specialRules" placeholder="مثال: لا يمكن تكرار نفس الفريق في نفس الجولة&#10;مثال: في الإقصائي، التعادل يعني أشواط إضافية ثم بلنتيات"></textarea>
+        <!-- تعديل القوانين -->
+        <div class="settings-section" id="settings-rules">
+          <label>القوانين الخاصة بالدوري</label>
+          <textarea id="specialRules" placeholder="اكتب كل قاعدة في سطر مستقل&#10;مثال: لا يمكن تكرار نفس الفريق في نفس الجولة&#10;مثال: في الإقصائي، التعادل يعني أشواط إضافية ثم بلنتيات"></textarea>
+          <div class="small-text">سيتم عرض هذه القوانين في صفحة القوانين بشكل منظم.</div>
+        </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px;">
           <div style="display:flex;align-items:center;gap:6px;">
             <button id="saveSettings">
               <span>حفظ الإعدادات</span>
             </button>
             <span class="status-text" id="saveStatus"></span>
           </div>
-          <div class="small-text">يتم حفظ الإعدادات محلياً في هذا المتصفح فقط</div>
+          <div class="small-text">كل الإعدادات يتم حفظها محلياً في هذا المتصفح.</div>
         </div>
-      </div>
-
-      <div class="panel" id="section-players">
-        <div class="panel-header">
-          <div class="panel-title">
-            <span class="panel-title-pill"></span>
-            <span>إدارة اللاعبين</span>
-          </div>
-          <span class="panel-subtitle">أضف أو احذف اللاعبين، وسيتم تحديث الأقسام الأخرى تلقائياً</span>
-        </div>
-
-        <label>اسم اللاعب / الكنية</label>
-        <input id="playerName" type="text" placeholder="مثال: أبو فلان، أو PSN ID">
-
-        <label>ملاحظات (اختياري: الفريق المفضل، المنصة...)</label>
-        <input id="playerNote" type="text" placeholder="مثال: PSG - PS5">
-
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <button id="addPlayer">
-            <span>إضافة لاعب</span>
-          </button>
-          <div class="small-text">يمكنك تعديل القائمة في أي وقت، حتى أثناء سير الدوري</div>
-        </div>
-
-        <div id="playersList" style="margin-top:10px;"></div>
       </div>
     </div>
 
@@ -722,7 +734,7 @@
   const state = {
     tournamentName: 'دوري EA FC 26 الرمضاني',
     platform: 'PlayStation',
-    format: 'groups-knockout',
+    format: 'league',
     duration: '',
     halfLength: 5,
     difficulty: 'محترف',
@@ -751,9 +763,9 @@
 
   function formatTextKey(format) {
     switch (format) {
-      case 'groups-knockout': return 'مجموعات ثم إقصائي';
-      case 'knockout': return 'نظام إقصائي مباشر';
-      case 'league': return 'دوري نقاط (الجميع ضد الجميع)';
+      case 'league': return 'دوري (الجميع ضد الجميع)';
+      case 'knockout': return 'كأس – إقصائي مباشر (خروج المغلوب)';
+      case 'groups-knockout': return 'مجموعات ثم كأس (مجموعات ثم إقصائي)';
       case 'friendly': return 'مباريات ودية حرة';
       default: return 'غير محدد';
     }
@@ -795,7 +807,7 @@
 
     const playersDisplay = $('playersDisplay');
     if (state.players.length === 0) {
-      playersDisplay.textContent = 'لم تتم إضافة لاعبين بعد. ابدأ بإضافة الأسماء من قسم إدارة اللاعبين.';
+      playersDisplay.textContent = 'لم تتم إضافة لاعبين بعد. ابدأ بإضافة الأسماء من صفحة الإعدادات.';
     } else {
       playersDisplay.innerHTML = state.players
         .map(p => `• ${p.name} ${p.note ? '— ' + p.note : ''}`)
@@ -808,7 +820,7 @@
 
     const summaryParts = [];
     summaryParts.push(`المنصة: ${state.platform}`);
-    summaryParts.push(`نظام البطولة: ${formatText}`);
+    summaryParts.push(`نوع البطولة: ${formatText}`);
     summaryParts.push(`مدة الشوط: ${state.halfLength} دقائق`);
     summaryParts.push(`المستوى: ${state.difficulty}`);
     if (state.duration) summaryParts.push(`المدة: ${state.duration}`);
@@ -822,7 +834,7 @@
       `مستوى الصعوبة: ${state.difficulty}`,
       `مساعدة التحكيم: ${state.refAssist}`,
       `اختيار الفرق: ${state.teamSelection}`,
-      `نظام البطولة: ${formatText}`
+      `نوع البطولة: ${formatText}`
     ];
     baseRules.concat(state.specialRules.filter(r => r.trim().length > 0))
       .forEach(rule => {
@@ -882,6 +894,25 @@
       saveState();
       render();
     };
+
+    // Settings internal tabs
+    const settingsTabs = document.querySelectorAll('.settings-tab');
+    const settingsSections = {
+      basic: document.getElementById('settings-basic'),
+      players: document.getElementById('settings-players'),
+      rules: document.getElementById('settings-rules')
+    };
+
+    settingsTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-settings');
+        settingsTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        Object.keys(settingsSections).forEach(key => {
+          settingsSections[key].classList.toggle('active', key === target);
+        });
+      });
+    });
 
     // Smooth navigation between sections
     const navButtons = document.querySelectorAll('.nav-pill');
