@@ -23,12 +23,23 @@
       function App() {
         const [isAdmin, setIsAdmin] = useState(false);
         const [activeTab, setActiveTab] = useState('viewer');
+        const [bottomTab, setBottomTab] = useState('main'); // main | matches | players | settings
         const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
         const [passwordInput, setPasswordInput] = useState('');
         const [passwordError, setPasswordError] = useState('');
-        const [matchFilter, setMatchFilter] = useState('all'); // all | played | upcoming
+        const [matchFilter, setMatchFilter] = useState('all');
         const [saveMessage, setSaveMessage] = useState('');
         const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+        const [showAddModal, setShowAddModal] = useState(false);
+        const [addVisitorName, setAddVisitorName] = useState('');
+        const [addVisitorNote, setAddVisitorNote] = useState('');
+        const [addMatchData, setAddMatchData] = useState({
+          team1Id: '',
+          team2Id: '',
+          date: '',
+          time: '',
+        });
+        const [pendingSuggestions, setPendingSuggestions] = useState([]);
 
         const [tournamentInfo, setTournamentInfo] = useState({
           name: 'دوري EA FC الرمضاني',
@@ -59,6 +70,8 @@
               if (parsed.players) setPlayers(parsed.players);
               if (parsed.matches) setMatches(parsed.matches);
               if (parsed.standings) setStandings(parsed.standings);
+              if (parsed.pendingSuggestions)
+                setPendingSuggestions(parsed.pendingSuggestions);
             }
           } catch (e) {
             console.warn('Failed to load saved state', e);
@@ -66,13 +79,19 @@
         }, []);
 
         useEffect(() => {
-          const data = { tournamentInfo, players, matches, standings };
+          const data = {
+            tournamentInfo,
+            players,
+            matches,
+            standings,
+            pendingSuggestions,
+          };
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
           } catch (e) {
             console.warn('Failed to save state', e);
           }
-        }, [tournamentInfo, players, matches, standings]);
+        }, [tournamentInfo, players, matches, standings, pendingSuggestions]);
 
         // --- Logic Functions ---
         const generateSchedule = () => {
@@ -223,177 +242,268 @@
 
         const formatFormat = (type) => type;
 
+        const handleQuickAdd = () => {
+          if (isAdmin) {
+            // Admin: فتح مودال لإضافة مباراة يدويًا
+            setAddMatchData({ team1Id: '', team2Id: '', date: '', time: '' });
+          } else {
+            // زائر: مودال اقتراح نتيجة
+            setAddVisitorName('');
+            setAddVisitorNote('');
+          }
+          setShowAddModal(true);
+        };
+
+        const handleConfirmAdd = () => {
+          if (isAdmin) {
+            const { team1Id, team2Id, date, time } = addMatchData;
+            const t1 = players.find((p) => p.id === Number(team1Id));
+            const t2 = players.find((p) => p.id === Number(team2Id));
+            if (!t1 || !t2 || t1.id === t2.id) {
+              alert('اختر لاعبين مختلفين لإضافة مباراة.');
+              return;
+            }
+            const newMatch = {
+              id: Date.now(),
+              team1: t1,
+              team2: t2,
+              score1: '',
+              score2: '',
+              date: date || 'يحدد لاحقاً',
+              time: time || '--:--',
+              isPlayed: false,
+            };
+            setMatches([...matches, newMatch]);
+            setShowAddModal(false);
+          } else {
+            if (!addVisitorName.trim() || !addVisitorNote.trim()) {
+              setPasswordError('أكمل الاسم والنتيجة المقترحة.');
+              return;
+            }
+            const suggestion = {
+              id: Date.now(),
+              name: addVisitorName.trim(),
+              text: addVisitorNote.trim(),
+            };
+            setPendingSuggestions([...pendingSuggestions, suggestion]);
+            setShowAddModal(false);
+            alert('تم إرسال اقتراحك للمدير للمراجعة.');
+          }
+        };
+
+        const handleAcceptSuggestion = (id) => {
+          setPendingSuggestions(
+            pendingSuggestions.filter((s) => s.id !== id)
+          );
+        };
+
+        const handleRejectSuggestion = (id) => {
+          setPendingSuggestions(
+            pendingSuggestions.filter((s) => s.id !== id)
+          );
+        };
+
         const ViewMode = () => (
-          <div className="space-y-6">
+          <div className="space-y-6 pb-16">
             {/* Standings */}
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
-              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
-                <span className="text-yellow-500 text-lg">🏆</span>
-                <h2 className="text-lg font-bold text-white">ترتيب الدوري</h2>
-                <span className="text-xs text-slate-400 ms-auto">مُحتسب آلياً</span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-right text-slate-300">
-                  <thead className="text-xs text-slate-400 bg-slate-800/30 uppercase">
-                    <tr>
-                      <th className="px-4 py-3 font-semibold">المركز</th>
-                      <th className="px-4 py-3 font-semibold">اللاعب</th>
-                      <th className="px-4 py-3 font-semibold text-center">لعب</th>
-                      <th className="px-4 py-3 font-semibold text-center text-green-400">فاز</th>
-                      <th className="px-4 py-3 font-semibold text-center text-slate-400">تعادل</th>
-                      <th className="px-4 py-3 font-semibold text-center text-red-400">خسر</th>
-                      <th className="px-4 py-3 font-semibold text-center">+ / -</th>
-                      <th className="px-4 py-3 font-semibold text-center text-yellow-500 text-base">النقاط</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {standings.map((team, index) => (
-                      <tr
-                        key={team.id}
-                        className={`border-b border-slate-800 hover:bg-slate-800/20 transition-colors cursor-pointer ${
-                          selectedPlayerId === team.id
-                            ? 'bg-slate-800/40'
-                            : ''
-                        }`}
-                        onClick={() => setSelectedPlayerId(team.id)}
-                      >
-                        <td className="px-4 py-3 font-bold text-slate-500">{index + 1}</td>
-                        <td className="px-4 py-3 font-medium text-white">{team.name}</td>
-                        <td className="px-4 py-3 text-center">{team.played}</td>
-                        <td className="px-4 py-3 text-center text-green-400/80">{team.won}</td>
-                        <td className="px-4 py-3 text-center text-slate-400/80">{team.drawn}</td>
-                        <td className="px-4 py-3 text-center text-red-400/80">{team.lost}</td>
-                        <td className="px-4 py-3 text-center" dir="ltr">{team.gf} : {team.ga}</td>
-                        <td className="px-4 py-3 text-center font-bold text-yellow-500 text-base">{team.points}</td>
-                      </tr>
-                    ))}
-                    {standings.length === 0 && (
+            {(bottomTab === 'main' || bottomTab === 'players') && (
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
+                  <span className="text-yellow-500 text-lg">🏆</span>
+                  <h2 className="text-lg font-bold text-white">ترتيب الدوري</h2>
+                  <span className="text-xs text-slate-400 ms-auto">مُحتسب آلياً</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-right text-slate-300">
+                    <thead className="text-xs text-slate-400 bg-slate-800/30 uppercase">
                       <tr>
-                        <td colSpan="8" className="px-4 py-8 text-center text-slate-500">
-                          لا يوجد بيانات لعرضها حتى الآن.
-                        </td>
+                        <th className="px-4 py-3 font-semibold">المركز</th>
+                        <th className="px-4 py-3 font-semibold">اللاعب</th>
+                        <th className="px-4 py-3 font-semibold text-center">لعب</th>
+                        <th className="px-4 py-3 font-semibold text-center text-green-400">فاز</th>
+                        <th className="px-4 py-3 font-semibold text-center text-slate-400">تعادل</th>
+                        <th className="px-4 py-3 font-semibold text-center text-red-400">خسر</th>
+                        <th className="px-4 py-3 font-semibold text-center">+ / -</th>
+                        <th className="px-4 py-3 font-semibold text-center text-yellow-500 text-base">النقاط</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              {selectedPlayerId && (
-                <div className="border-t border-slate-800 p-4 text-sm text-slate-300 bg-slate-950/40">
-                  {(() => {
-                    const p = standings.find((s) => s.id === selectedPlayerId);
-                    if (!p) return null;
-                    return (
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                        <div>
-                          <div className="text-white font-bold">{p.name}</div>
+                    </thead>
+                    <tbody>
+                      {standings.map((team, index) => (
+                        <tr
+                          key={team.id}
+                          className={`border-b border-slate-800 hover:bg-slate-800/20 transition-colors cursor-pointer ${
+                            selectedPlayerId === team.id
+                              ? 'bg-slate-800/40'
+                              : ''
+                          }`}
+                          onClick={() => setSelectedPlayerId(team.id)}
+                        >
+                          <td className="px-4 py-3 font-bold text-slate-500">{index + 1}</td>
+                          <td className="px-4 py-3 font-medium text-white">{team.name}</td>
+                          <td className="px-4 py-3 text-center">{team.played}</td>
+                          <td className="px-4 py-3 text-center text-green-400/80">{team.won}</td>
+                          <td className="px-4 py-3 text-center text-slate-400/80">{team.drawn}</td>
+                          <td className="px-4 py-3 text-center text-red-400/80">{team.lost}</td>
+                          <td className="px-4 py-3 text-center" dir="ltr">{team.gf} : {team.ga}</td>
+                          <td className="px-4 py-3 text-center font-bold text-yellow-500 text-base">{team.points}</td>
+                        </tr>
+                      ))}
+                      {standings.length === 0 && (
+                        <tr>
+                          <td colSpan="8" className="px-4 py-8 text-center text-slate-500">
+                            لا يوجد بيانات لعرضها حتى الآن.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                {selectedPlayerId && (
+                  <div className="border-t border-slate-800 p-4 text-sm text-slate-300 bg-slate-950/40">
+                    {(() => {
+                      const p = standings.find((s) => s.id === selectedPlayerId);
+                      if (!p) return null;
+                      return (
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                          <div>
+                            <div className="text-white font-bold">{p.name}</div>
+                            <div className="text-xs text-slate-400">
+                              مباريات: {p.played} | فوز: {p.won} | تعادل: {p.drawn} | خسارة: {p.lost}
+                            </div>
+                          </div>
                           <div className="text-xs text-slate-400">
-                            مباريات: {p.played} | فوز: {p.won} | تعادل: {p.drawn} | خسارة: {p.lost}
+                            أهداف: {p.gf} له / {p.ga} عليه | فارق: {p.gf - p.ga} | نقاط: {p.points}
                           </div>
                         </div>
-                        <div className="text-xs text-slate-400">
-                          أهداف: {p.gf} له / {p.ga} عليه | فارق: {p.gf - p.ga} | نقاط: {p.points}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-
-            {/* Matches */}
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
-              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-blue-400 text-lg">📅</span>
-                  <h2 className="text-lg font-bold text-white">جدول المباريات</h2>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <span>المباريات الملعوبة: {playedCount} / {matches.length}</span>
-                  <div className="flex bg-slate-900 rounded-full border border-slate-700 overflow-hidden">
-                    {['all', 'played', 'upcoming'].map((f) => (
-                      <button
-                        key={f}
-                        className={`px-3 py-1 ${
-                          matchFilter === f
-                            ? 'bg-slate-700 text-yellow-400'
-                            : 'text-slate-400'
-                        }`}
-                        onClick={() => setMatchFilter(f)}
-                      >
-                        {f === 'all'
-                          ? 'الكل'
-                          : f === 'played'
-                          ? 'الملعوبة'
-                          : 'القادمة'}
-                      </button>
-                    ))}
+                      );
+                    })()}
                   </div>
-                </div>
-              </div>
-              <div className="p-4 space-y-3">
-                {filteredMatches.length === 0 ? (
-                  <p className="text-center text-slate-500 py-4">
-                    لا توجد مباريات في هذا الفلتر.
-                  </p>
-                ) : (
-                  filteredMatches.map((match) => (
-                    <div
-                      key={match.id}
-                      className={`flex flex-col md:flex-row items-center justify-between rounded-xl p-3 border ${
-                        match.isPlayed
-                          ? 'bg-slate-900 border-green-900/50'
-                          : 'bg-slate-900 border-slate-800'
-                      }`}
-                    >
-                      <div className="text-xs text-slate-400 mb-2 md:mb-0 w-full md:w-auto text-center md:text-right">
-                        <span>{match.date}</span> - <span>{match.time}</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-4 flex-1 w-full">
-                        <div className="text-sm font-medium text-white text-left flex-1 truncate">
-                          {match.team1.name}
-                        </div>
-                        <div className="flex items-center justify-center bg-slate-950 rounded-lg px-4 py-1.5 min-w-[80px] border border-slate-700">
-                          {match.isPlayed ? (
-                            <span className="font-bold text-yellow-500 tracking-widest">
-                              {match.score1} - {match.score2}
-                            </span>
-                          ) : (
-                            <span className="text-slate-500 text-xs">VS</span>
-                          )}
-                        </div>
-                        <div className="text-sm font-medium text-white text-right flex-1 truncate">
-                          {match.team2.name}
-                        </div>
-                      </div>
-                    </div>
-                  ))
                 )}
               </div>
-            </div>
+            )}
 
-            {/* Rules */}
-            <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
-              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
-                <span className="text-purple-400 text-lg">⚠️</span>
-                <h2 className="text-lg font-bold text-white">قوانين الدوري</h2>
-              </div>
-              <div className="p-5">
-                <div className="mb-4">
-                  <span className="text-xs text-slate-400 block mb-1">نوع البطولة:</span>
-                  <span className="text-sm text-white bg-slate-800 px-3 py-1 rounded-md">
-                    {tournamentInfo.type}
-                  </span>
+            {/* Matches */}
+            {(bottomTab === 'main' || bottomTab === 'matches') && (
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-blue-400 text-lg">📅</span>
+                    <h2 className="text-lg font-bold text-white">جدول المباريات</h2>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span>المباريات الملعوبة: {playedCount} / {matches.length}</span>
+                    <div className="flex bg-slate-900 rounded-full border border-slate-700 overflow-hidden">
+                      {['all', 'played', 'upcoming'].map((f) => (
+                        <button
+                          key={f}
+                          className={`px-3 py-1 ${
+                            matchFilter === f
+                              ? 'bg-slate-700 text-yellow-400'
+                              : 'text-slate-400'
+                          }`}
+                          onClick={() => setMatchFilter(f)}
+                        >
+                          {f === 'all'
+                            ? 'الكل'
+                            : f === 'played'
+                            ? 'الملعوبة'
+                            : 'القادمة'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="whitespace-pre-wrap text-sm text-slate-300 leading-relaxed border-t border-slate-800 pt-4">
-                  {tournamentInfo.rules || 'لا توجد قوانين مسجلة.'}
+                <div className="p-4 space-y-3">
+                  {filteredMatches.length === 0 ? (
+                    <p className="text-center text-slate-500 py-4">
+                      لا توجد مباريات في هذا الفلتر.
+                    </p>
+                  ) : (
+                    filteredMatches.map((match) => (
+                      <div
+                        key={match.id}
+                        className={`flex flex-col md:flex-row items-center justify-between rounded-xl p-3 border ${
+                          match.isPlayed
+                            ? 'bg-slate-900 border-green-900/50'
+                            : 'bg-slate-900 border-slate-800'
+                        }`}
+                      >
+                        <div className="text-xs text-slate-400 mb-2 md:mb-0 w-full md:w-auto text-center md:text-right">
+                          <span>{match.date}</span> - <span>{match.time}</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-4 flex-1 w-full">
+                          <div className="text-sm font-medium text-white text-left flex-1 truncate">
+                            {match.team1.name}
+                          </div>
+                          <div className="flex items-center justify-center bg-slate-950 rounded-lg px-4 py-1.5 min-w-[80px] border border-slate-700">
+                            {match.isPlayed ? (
+                              <span className="font-bold text-yellow-500 tracking-widest">
+                                {match.score1} - {match.score2}
+                              </span>
+                            ) : (
+                              <span className="text-slate-500 text-xs">VS</span>
+                            )}
+                          </div>
+                          <div className="text-sm font-medium text-white text-right flex-1 truncate">
+                            {match.team2.name}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Players list for viewers */}
+            {bottomTab === 'players' && (
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
+                  <span className="text-blue-400 text-lg">👥</span>
+                  <h2 className="text-lg font-bold text-white">قائمة اللاعبين</h2>
+                </div>
+                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {players.map((p) => (
+                    <div
+                      key={p.id}
+                      className="bg-slate-800/60 border border-slate-700 rounded-lg p-3"
+                    >
+                      <div className="text-white font-medium mb-1">{p.name}</div>
+                      {p.note && (
+                        <div className="text-xs text-slate-400">{p.note}</div>
+                      )}
+                    </div>
+                  ))}
+                  {players.length === 0 && (
+                    <div className="col-span-full text-center text-slate-500 text-sm">
+                      لا يوجد لاعبين مضافين.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Viewer settings (appearance only) */}
+            {bottomTab === 'settings' && (
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
+                <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
+                  <span className="text-slate-200 text-lg">⚙️</span>
+                  <h2 className="text-lg font-bold text-white">إعدادات العرض</h2>
+                </div>
+                <div className="p-5 text-sm text-slate-300">
+                  <p className="mb-2">هذه الإعدادات تخص شكل العرض فقط:</p>
+                  <ul className="list-disc pr-5 text-xs text-slate-400 space-y-1">
+                    <li>الوضع الليلي مفعّل افتراضياً في هذا التصميم.</li>
+                    <li>يمكن مستقبلاً إضافة خيارات لتكبير الخط أو تغيير الألوان.</li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         );
 
         const AdminMode = () => (
-          <div className="space-y-6">
+          <div className="space-y-6 pb-16">
             {/* Settings */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
               <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
@@ -509,7 +619,7 @@
 
             {/* Rules */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg">
-              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items-center gap-3">
+              <div className="p-4 bg-slate-800/50 border-b border-slate-700/50 flex items=center gap-3">
                 <span className="text-purple-400 text-lg">⚠️</span>
                 <h2 className="text-lg font-bold text-white">قوانين الدوري</h2>
               </div>
@@ -590,7 +700,11 @@
                                 className="w-12 h-10 bg-slate-800 border border-slate-600 rounded-md text-center text-white font-bold focus:outline-none focus:border-yellow-500 focus:bg-slate-700"
                                 value={match.score1}
                                 onChange={(e) =>
-                                  handleMatchScoreChange(match.id, 'score1', e.target.value)
+                                  handleMatchScoreChange(
+                                    match.id,
+                                    'score1',
+                                    e.target.value
+                                  )
                                 }
                               />
                               <span className="text-slate-500">-</span>
@@ -600,7 +714,11 @@
                                 className="w-12 h-10 bg-slate-800 border border-slate-600 rounded-md text-center text-white font-bold focus:outline-none focus:border-yellow-500 focus:bg-slate-700"
                                 value={match.score2}
                                 onChange={(e) =>
-                                  handleMatchScoreChange(match.id, 'score2', e.target.value)
+                                  handleMatchScoreChange(
+                                    match.id,
+                                    'score2',
+                                    e.target.value
+                                  )
                                 }
                               />
                             </div>
@@ -616,7 +734,47 @@
               </div>
             </div>
 
-            {/* Admin Tools */}
+            {/* Pending suggestions */}
+            {pendingSuggestions.length > 0 && (
+              <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg p-5">
+                <h3 className="text-sm font-bold text-slate-400 mb-3 flex items-center gap-2">
+                  📨 اقتراحات الزوار ({pendingSuggestions.length})
+                </h3>
+                <div className="space-y-2 text-xs">
+                  {pendingSuggestions.map((s) => (
+                    <div
+                      key={s.id}
+                      className="border border-slate-700 rounded-lg p-3 flex justify-between gap-3 bg-slate-950"
+                    >
+                      <div>
+                        <div className="text-slate-200 font-medium mb-1">
+                          {s.name}
+                        </div>
+                        <div className="text-slate-400 whitespace-pre-wrap">
+                          {s.text}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2 text-xs">
+                        <button
+                          className="bg-green-500/20 text-green-400 border border-green-500/40 rounded px-3 py-1"
+                          onClick={() => handleAcceptSuggestion(s.id)}
+                        >
+                          قبول (تأكيد تمت المعالجة)
+                        </button>
+                        <button
+                          className="bg-red-500/10 text-red-400 border border-red-500/40 rounded px-3 py-1"
+                          onClick={() => handleRejectSuggestion(s.id)}
+                        >
+                          تجاهل
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Admin tools */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-lg p-5">
               <h3 className="text-sm font-bold text-slate-400 mb-4">أدوات المنظم</h3>
               <div className="flex flex-wrap gap-3 mb-3">
@@ -676,6 +834,7 @@
 
         return (
           <div className="min-h-screen bg-slate-950 text-slate-200 font-sans pb-20" dir="rtl">
+            {/* Header */}
             <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-md">
               <div className="max-w-4xl mx-auto px-4 py-4">
                 <div className="flex items-center justify-between mb-4">
@@ -738,6 +897,217 @@
               {activeTab === 'viewer' ? <ViewMode /> : <AdminMode />}
             </main>
 
+            {/* Bottom bar */}
+            <div className="fixed bottom-0 inset-x-0 bg-slate-900 border-t border-slate-800 shadow-[0_-4px_10px_rgba(0,0,0,0.6)]">
+              <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs">
+                <button
+                  onClick={() => setBottomTab('main')}
+                  className={`flex flex-col items-center flex-1 ${
+                    bottomTab === 'main' ? 'text-yellow-400' : 'text-slate-400'
+                  }`}
+                >
+                  <span>🏠</span>
+                  <span>الرئيسية</span>
+                </button>
+                <button
+                  onClick={() => setBottomTab('matches')}
+                  className={`flex flex-col items-center flex-1 ${
+                    bottomTab === 'matches' ? 'text-yellow-400' : 'text-slate-400'
+                  }`}
+                >
+                  <span>📅</span>
+                  <span>الجدول</span>
+                </button>
+                <button
+                  onClick={handleQuickAdd}
+                  className="flex items-center justify-center flex-none w-12 h-12 rounded-full bg-yellow-500 text-slate-900 text-2xl border-4 border-slate-900 -mt-6 shadow-lg"
+                  title={
+                    isAdmin
+                      ? 'إضافة مباراة يدوياً'
+                      : 'اقتراح نتيجة للمدير'
+                  }
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => setBottomTab('players')}
+                  className={`flex flex-col items-center flex-1 ${
+                    bottomTab === 'players' ? 'text-yellow-400' : 'text-slate-400'
+                  }`}
+                >
+                  <span>👥</span>
+                  <span>اللاعبون</span>
+                </button>
+                <button
+                  onClick={() => setBottomTab('settings')}
+                  className={`flex flex-col items-center flex-1 ${
+                    bottomTab === 'settings' ? 'text-yellow-400' : 'text-slate-400'
+                  }`}
+                >
+                  <span>⚙️</span>
+                  <span>{isAdmin ? 'الأدوات' : 'الواجهة'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Password Modal */}
+            {showPasswordPrompt && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20">
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4">
+                  <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    🔑 تسجيل دخول المدير
+                  </h2>
+                  <p className="text-xs text-slate-400 mb-4">
+                    أدخل كلمة المرور لتفعيل وضع الإدارة. هذه الخطوة لا تؤثر إلا على هذا المتصفح.
+                  </p>
+                  <input
+                    type="password"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-yellow-500 mb-2"
+                    placeholder="كلمة المرور"
+                    value={passwordInput}
+                    onChange={(e) => {
+                      setPasswordInput(e.target.value);
+                      setPasswordError('');
+                    }}
+                  />
+                  {passwordError && (
+                    <p className="text-xs text-red-400 mb-2">{passwordError}</p>
+                  )}
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button
+                      className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700"
+                      onClick={() => {
+                        setShowPasswordPrompt(false);
+                        setPasswordInput('');
+                        setPasswordError('');
+                      }}
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      className="text-xs px-3 py-1.5 rounded-lg bg-yellow-500 text-slate-900 font-bold"
+                      onClick={handleConfirmPassword}
+                    >
+                      تأكيد
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add Modal (center button) */}
+            {showAddModal && (
+              <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-30">
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4 text-sm">
+                  {isAdmin ? (
+                    <>
+                      <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        ➕ إضافة مباراة يدوياً
+                      </h2>
+                      <p className="text-xs text-slate-400 mb-3">
+                        اختر لاعبين وضع التاريخ والوقت (يمكن تركهما افتراضياً).
+                      </p>
+                      <label className="block text-xs text-slate-400 mb-1">اللاعب الأول</label>
+                      <select
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 mb-2 text-white"
+                        value={addMatchData.team1Id}
+                        onChange={(e) =>
+                          setAddMatchData({
+                            ...addMatchData,
+                            team1Id: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="">اختر اللاعب الأول</option>
+                        {players.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
+                      <label className="block text-xs text-slate-400 mb-1">اللاعب الثاني</label>
+                      <select
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 mb-2 text-white"
+                        value={addMatchData.team2Id}
+                        onChange={(e) =>
+                          setAddMatchData({
+                            ...addMatchData,
+                            team2Id: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="">اختر اللاعب الثاني</option>
+                        {players.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="flex gap-2 mb-3">
+                        <input
+                          type="text"
+                          placeholder="التاريخ"
+                          className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"
+                          value={addMatchData.date}
+                          onChange={(e) =>
+                            setAddMatchData({ ...addMatchData, date: e.target.value })
+                          }
+                        />
+                        <input
+                          type="text"
+                          placeholder="الوقت"
+                          className="w-24 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white"
+                          value={addMatchData.time}
+                          onChange={(e) =>
+                            setAddMatchData({ ...addMatchData, time: e.target.value })
+                          }
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        ✉️ اقتراح نتيجة للمدير
+                      </h2>
+                      <p className="text-xs text-slate-400 mb-3">
+                        اذكر اسمك والنتيجة المقترحة أو ملاحظة للمدير.
+                      </p>
+                      <label className="block text-xs text-slate-400 mb-1">اسمك</label>
+                      <input
+                        type="text"
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 mb-2 text-white text-xs"
+                        value={addVisitorName}
+                        onChange={(e) => setAddVisitorName(e.target.value)}
+                        placeholder="مثال: أبو محمد"
+                      />
+                      <label className="block text-xs text-slate-400 mb-1">النتيجة / الملاحظة</label>
+                      <textarea
+                        className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 mb-2 text-white text-xs min-h-[80px]"
+                        value={addVisitorNote}
+                        onChange={(e) => setAddVisitorNote(e.target.value)}
+                        placeholder="مثال: مباراة أحمد ضد خالد انتهت 3-2"
+                      />
+                    </>
+                  )}
+                  <div className="flex justify-end gap-2 mt-2">
+                    <button
+                      className="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700"
+                      onClick={() => setShowAddModal(false)}
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      className="text-xs px-3 py-1.5 rounded-lg bg-yellow-500 text-slate-900 font-bold"
+                      onClick={handleConfirmAdd}
+                    >
+                      تأكيد
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Password Modal */}
             {showPasswordPrompt && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-20">
                 <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm mx-4">
